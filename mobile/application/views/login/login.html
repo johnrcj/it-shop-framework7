@@ -1,0 +1,326 @@
+<template>
+    <div class="page" data-name="login">
+        <div class="page-content main-content-panel">
+            <div class="label-panel">
+                <label class="label-normal">{{$root.lang['login']}}</label>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-large">{{$root.lang['welcome_to_conpang']}}</label>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-small">{{$root.lang['scattered_gift_certificates_at_a_glance']}}</label>
+            </div>
+
+            <div class="input-panel multiline mt-8vw">
+                <input type="email" name="email" @keyup="onKeyup" @input="onInput" maxlength="20">
+                <span @click="onFocus" class="placeholder">{{$root.lang['please_enter_registered_your_id_email']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="input-panel multiline mt-2.5vw">
+                <input type="password" name="pwd" @keyup="onKeyup" @input="onInput" maxlength="20">
+                <span @click="onFocus" class="placeholder">{{$root.lang['please_enter_a_password']}}</span>
+                <i @click="onEye" class="eye f7-icon hidden" name="eye">eye</i>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc theme-color">{{this.err_msg}}</label>
+            </div>
+
+            <a @click="onLogin" class="link button-panel mt-4vw">{{$root.lang['login']}}</a>
+            <a @click="onKKLogin" class="link button-panel kk mt-4vw">{{$root.lang['kk']}}</a>
+            {{#js_if 'this.is_iOS == true'}}
+            <a @click="onAppleLogin" class="link button-panel apple mt-4vw">{{$root.lang['apple']}}</a>
+            {{/js_if}}
+
+            <div class="label-panel center mt-4vw">
+                <label class="label-desc-normal">{{$root.lang['are_you_new_to_conpang']}}</label>
+                <a @click="onSignUp" class="label-desc theme-color">{{$root.lang['signup']}}</a>
+            </div>
+
+            <div class="label-panel center mt-8vw">
+                <label class="label-desc-normal">{{$root.lang['have_you_forgotten_your_password']}}</label>
+                <a @click="onFindPwd" class="label-desc theme-color">{{$root.lang['find_password']}}</a>
+            </div>
+
+            <div class="label-panel center mb-6vw">
+                <label class="label-desc-normal">{{$root.lang['have_you_forgotten_your_id']}}</label>
+                <a @click="onFindId" class="label-desc theme-color">{{$root.lang['find_id']}}</a>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                email: "",
+                pwd: "",
+                err_msg: "",
+                is_iOS: false,
+            }
+        },
+        methods: {
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+            },
+
+            onInput: function(e) {
+                let self = this;
+
+                let name = e.target.name;
+
+                var maxlength = e.target.maxLength;
+                if (maxlength > 0 && e.target.value.length > maxlength) {
+                    $('[data-name=login] input[name=' + name + ']').val(e.target.value.substring(0, maxlength));
+                    return;
+                }
+
+                self[name] = e.target.value;
+
+                if (name === "pwd") {
+                    if (self.pwd === "")
+                        $('[data-name=login] i[name=eye]').addClass('hidden');
+                    else
+                        $('[data-name=login] i[name=eye]').removeClass('hidden');
+                }
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+                if (e.keyCode === 13) {
+                    let name = e.target.name;
+                    if (name === "email") {
+                        $('[data-name=login] input[name=pwd]').focus();
+                    } else {
+                        self.onLogin();
+                    }
+                }
+            },
+
+            onEye: function(e) {
+                let self = this;
+
+                let pwd = $('[data-name=login] input[name=pwd]');
+                if(pwd.attr("type") === "password"){
+                    pwd.attr("type","text");
+                } else {
+                    pwd.attr("type","password");
+                }
+            },
+
+            onLogin: function() {
+                var self = this;
+
+                if (self.email === "") {
+                    self.$setState({
+                        err_msg: self.$root.lang['please_enter_registered_your_id_email']
+                    });
+                    return;
+                }
+
+                if (!self.pwd) {
+                    self.$setState({
+                        err_msg: self.$root.lang['please_enter_a_password']
+                    });
+                    return;
+                }
+
+                $('[data-name=login] input[name=pwd]').blur();
+
+                //check api
+                request('/Intro/check_login', {
+                    usr_type: 1,
+                    email: self.email,
+                    name: "",
+                    pwd: self.pwd,
+                    dev_type: isAndroid() ? 1 : 2,
+                    fcm_token: self.$root.fcm_token,
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        self.$root.login_user.uid = result.usr_uid;
+                        self.$root.login_user.usr_type = 1;
+
+                        bridgeLoginSuccess(1, self.email, self.pwd);
+
+                        changeBottomMenuSelected(1);
+                        $('[data-name=main]').remove();
+                        self.$root.navigate('/main');
+                    } else if (result.code === self.$root.CONST.RES_ERROR_INCORRECT_EMAIL) {
+                        self.$setState({
+                            err_msg: self.$root.lang['incorrect_email']
+                        });
+                    } else if (result.code === self.$root.CONST.RES_ERROR_INCORRECT_PWD) {
+                        self.$setState({
+                            err_msg: self.$root.lang['incorrect_pwd']
+                        });
+                    } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK) {
+                        self.$setState({
+                            err_msg: self.$root.lang['block_user_error']
+                        });
+                    } else if (result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                        self.$setState({
+                            err_msg: self.$root.lang['withdrawal_user_error']
+                        });
+                    } else {
+                        self.$setState({
+                            err_msg: result.msg
+                        });
+                    }
+                })
+            },
+
+            onKKLogin: function() {
+                let self = this;
+
+                bridgeSnsInfo(2, function(email, name) {
+                    //check api
+                    request('/Intro/check_login', {
+                        usr_type: 2,
+                        email: email,
+                        name: name,
+                        pwd: "",
+                        dev_type: isAndroid() ? 1 : 2,
+                        fcm_token: self.$root.fcm_token,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$root.login_user.uid = result.usr_uid;
+                            self.$root.login_user.usr_type = 2;
+
+                            bridgeLoginSuccess(2, email, "");
+
+                            changeBottomMenuSelected(1);
+                            $('[data-name=main]').remove();
+                            self.$root.navigate('/main');
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK) {
+                            self.$setState({
+                                err_msg: self.$root.lang['block_user_error'],
+                            });
+                        } else {
+                            self.$root.navigate({
+                                path: '/signup',
+                                query: {
+                                    usr_type: 2,
+                                    email: email,
+                                    name: name,
+                                }
+                            })
+                        }
+                    })
+                })
+            },
+
+            onAppleLogin: function() {
+                let self = this;
+
+                bridgeAppleInfo(function(email, name) {
+                    //check api
+                    request('/Intro/check_login', {
+                        usr_type: 3,
+                        email: email,
+                        name: name,
+                        pwd: "",
+                        dev_type: 2,
+                        fcm_token: self.$root.fcm_token,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$root.login_user.uid = result.usr_uid;
+                            self.$root.login_user.usr_type = 2;
+
+                            bridgeLoginSuccess(3, email, "");
+
+                            changeBottomMenuSelected(1);
+                            $('[data-name=main]').remove();
+                            self.$root.navigate('/main');
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK) {
+                            self.$setState({
+                                err_msg: self.$root.lang['block_user_error'],
+                            });
+                        } else {
+                            self.$root.navigate({
+                                path: '/signup',
+                                query: {
+                                    usr_type: 3,
+                                    email: email,
+                                    name: name,
+                                }
+                            })
+                        }
+                    })
+                })
+            },
+
+            onFindPwd: function() {
+                var self = this;
+
+                // if (self.email === "") {
+                //     self.$setState({
+                //         err_msg: self.$root.lang['please_enter_registered_your_id_email'],
+                //     });
+                //
+                //     return;
+                // }
+
+                self.$root.navigate({
+                    path: '/find_pwd',
+                    query: {
+                        // email: self.email,
+                    }
+                });
+            },
+            onFindId: function() {
+                var self = this;
+
+                // if (self.email === "") {
+                //     self.$setState({
+                //         err_msg: self.$root.lang['please_enter_your_phone'],
+                //     });
+                //
+                //     return;
+                // }
+
+                self.$root.navigate({
+                    path: '/find_id',
+                    query: {
+                        // phone: self.email,
+                    }
+                });
+            },
+
+            onSignUp: function() {
+                var self = this;
+
+                self.$root.navigate({
+                    path: '/signup',
+                    query: {
+                        usr_type: 1,
+                    }
+                })
+            },
+        },
+        on: {
+            pageInit: function (page) {
+                var self = this;
+
+                hideMainBottomMenu();
+
+                if (isIOS()) {
+                    self.$setState({
+                        is_iOS: true
+                    });
+                }
+            },
+
+            pageReinit: function (page) {
+                var self = this;
+
+                if (self.$root.prev_page_name === "login") {
+                    hideMainBottomMenu();
+                }
+            }
+        }
+    }
+</script>

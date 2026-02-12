@@ -1,0 +1,61 @@
+<template>
+    <div class="page" data-name="useterm">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{this.title}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            <div class="textarea-panel h-full readonly">
+                <textarea readonly>{{this.content}}</textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                title: "",
+                content: "",
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            loadPageInfo: function() {
+                let self = this;
+
+                request('Term/get_use_term', {
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                title: result.title,
+                                content: result.content,
+                            });
+                        } else {
+                        }
+                    })
+            },
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

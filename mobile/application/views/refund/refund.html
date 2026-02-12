@@ -1,0 +1,254 @@
+<template>
+    <div class="page" data-name="refund">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['refund']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center bg-white pt-16vw px-3vw">
+            <span class="text-3.2vw">{{$root.lang['estimated_amount_cash']}}</span>
+            <span class="badge ml-2vw" @click="onAmountTip">!</span></i>
+            <span class="flex-1 text-3.2vw text-right color-gray">{{$root.lang['lookup_date']}}{{this.lookup_date}}</span>
+        </div>
+        <div class="flex items-end px-3vw pb-2vw bg-white">
+            <span class="text-10vw color-light-green">{{this.selected_price}}</span>
+            <span class="text-6vw mb-1.5vw">$</span>
+        </div>
+        <div class="page-content pb-70vw back-gray">
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">
+                <span class="flex-1 text-3.2vw text-center color-gray">{{$root.lang['total_cashable_vouchers']}}{{this.voucher_count}}{{$root.lang['cnt']}}</span>
+            </div>
+            <div class="voucher-list" id="cashable_list">
+                {{#each this.voucher_array}}
+                <div class="voucher" @click="onSelectVoucher({{this.uid}})" id="voucher-refund-{{this.uid}}">
+                    <div class="voucher-image">
+                        <img src="{{this.image_url}}">
+                    </div>
+                    <div class="voucher-info mt-6vw mb-6vw">
+                        <div class="others">
+                            <div class="where-use">{{this.where_use}}</div>
+                            <div class="expire-days">{{this.self.$root.lang['expired_gift_voucher']}}</div>
+                        </div>
+                        <div class="name mt-2.5vw">{{this.name}}</div>
+                    </div>
+                    <div class="select-area items-center justify-center">
+                        <div>
+                            <img src="assets/images/ic_checked.png"/>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">
+                <span class="flex-1 text-3.2vw text-center color-gray">{{$root.lang['total_refunded_vouchers']}}{{this.refund_count}}{{$root.lang['cnt']}}</span>
+            </div>
+            <div class="mb-1.5vw voucher-list">
+                {{#each this.refund_array}}
+                <div class="voucher">
+                    <div class="voucher-image">
+                        <img src="{{this.image_url}}">
+                    </div>
+                    <div class="voucher-info mt-6vw mb-6vw">
+                        <div class="others">
+                            <div class="where-use">{{this.where_use}}</div>
+                            <div class="expire-days">{{this.self.$root.lang['refund_end']}}</div>
+                        </div>
+                        <div class="name mt-2.5vw">{{this.name}}</div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="select-action-panel inline bottom-15vw px-5vw">
+            {{#js_if 'this.sel_ids.length == 0'}}
+            <a class="button button-raised button-white flex-1" @click="onSelectAll">{{$root.lang['select_all']}}</a>
+            {{/js_if}}
+            {{#js_if 'this.sel_ids.length > 0'}}
+            <a class="button button-raised button-white button-left" @click="onSelectAll">{{$root.lang['select_all']}}</a>
+            <a class="button button-raised button-blue button-right ml-5vw" @click="onApplyForSelect">
+                {{$root.lang['apply_for_select']}}
+                <span class="badge color-light-green">{{this.sel_ids.length}}</span></i>
+            </a>
+            {{/js_if}}
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                isSelectMode: false,
+                sel_ids: [],
+                voucher_array: [],
+                refund_array: [],
+                voucher_count: 0,
+                refund_count: 0,
+                selected_price: "0",
+                lookup_date: "",
+                cash_mark: "",
+            }
+        },
+        methods: {
+            onSelectVoucher: function(uid) {
+                let self = this;
+
+                var ids = self.sel_ids;
+                if ($("#voucher-refund-" + uid).hasClass('voucher-selected') === true) {
+                    ids = ids.filter(function(id) { return id !== parseInt(uid);})
+                    $("#voucher-refund-" + uid).removeClass('voucher-selected');
+                }
+                else {
+                    ids.push(uid);
+                    $("#voucher-refund-" + uid).addClass('voucher-selected');
+                }
+
+                let sumPrice = 0;
+                for (var i = 0; i < ids.length; i++) {
+                    let selId = ids[i];
+                    for (var i_voucher = 0; i_voucher < self.voucher_array.length; i_voucher++) {
+                        let voucher = self.voucher_array[i_voucher];
+                        if (selId === parseInt(voucher.uid)) {
+                            sumPrice += parseInt(voucher.price);
+                            break;
+                        }
+                    }
+                }
+
+                self.$setState({
+                    sel_ids : ids,
+                    selected_price: sumPrice.toLocaleString('en-US'),
+                })  
+            },
+
+            onSelectAll: function() {
+                let self = this;
+
+                let vouchers = $("#cashable_list > .voucher");
+                var ids = self.sel_ids;
+                for (var i = 0; i < vouchers.length; i ++) {
+                    let voucher = vouchers[i];
+
+                    if ($(voucher).hasClass('voucher-selected') === true)
+                        continue;
+                    $(voucher).addClass('voucher-selected');
+                    var id = $(voucher).attr('id');
+                    id = parseInt(id.substring(15), 10);
+                    ids.push(id);
+                }
+
+                let sumPrice = 0;
+                for (var i_voucher = 0; i_voucher < self.voucher_array.length; i_voucher++) {
+                    let voucher = self.voucher_array[i_voucher]
+                    sumPrice += parseInt(voucher.price);
+                }
+
+                self.$setState({
+                    sel_ids : ids,
+                    selected_price: sumPrice.toLocaleString('en-US'),
+                })
+            },
+
+            onApplyForSelect: function() {
+                let self = this;
+
+                var selected_voucher = [];
+                for (var i = 0; i < self.sel_ids.length; i++) {
+                    let selId = self.sel_ids[i];
+                    for (var i_voucher = 0; i_voucher < self.voucher_array.length; i_voucher++) {
+                        let voucher = self.voucher_array[i_voucher]
+                        if (selId === voucher.uid) {
+                            selected_voucher.push(voucher);
+                            break;
+                        }
+                    }
+                }
+                var ids = self.sel_ids[0];
+                for (var i = 1; i < self.sel_ids.length; i++) {
+                    ids += ' ' + self.sel_ids[i];
+                }
+                
+                self.$root.navigate({
+                    path: '/refund/my_voucher',
+                    query: {
+                        sel_ids: ids,
+                    }
+                });
+            },
+
+            onAmountTip: function() {
+                let self = this;
+
+                if (self.cash_mark !== "")
+                    showToast(self.cash_mark, 10000);
+            },
+
+            coverVoucherWithSelf: function (list) {
+                let self = this;
+
+                var new_list = [];
+                if (list.length > 0) {
+                    list.forEach((obj, idx) => {
+                        var item = obj;
+                        item['self'] = self;
+                        new_list.push(item);
+                    })
+                }
+
+                return new_list;
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/refund/get_refund_list', {
+                    usr_uid: self.$root.login_user.uid
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            refund_array = self.coverVoucherWithSelf(result.refund_array);
+                            voucher_array = self.coverVoucherWithSelf(result.voucher_array);
+                            self.$setState({
+                                refund_count: result.refund_count,
+                                refund_array: result.refund_array,
+                                voucher_count: result.voucher_count,
+                                voucher_array: voucher_array,
+                                lookup_date: result.lookup_date,
+                                isSelectMode: false,
+                                sel_ids: [],
+                                selected_price: "0",
+                                cash_mark: result.cash_mark,
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                showMainBottomMenu();
+                self.loadPageInfo();
+            },
+            
+            pageReinit: function(e) {
+                let self = this;
+
+                if (self.$root.prev_page_name === "refund") {
+                    showMainBottomMenu();
+                }
+
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

@@ -1,0 +1,82 @@
+<template>
+    <div class="page" data-name="find_pwd">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['find_password']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            <div class="label-panel center mt-6vw">
+                <img src="assets/images/ic_lock_findpwd.png">
+            </div>
+
+            <div class="label-panel center">
+                <label class="label-desc center">{{$root.lang['find_password_top_help']}}</label>
+            </div>
+
+            <div class="bottom-panel">
+                <label class="label-desc theme-color">{{this.err_msg}}</label>
+
+                <a @click="onReset" class="button-panel mt-2.5vw">{{$root.lang['identify_verification']}}</a>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                email: "",
+                err_msg: "",
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onReset: function () {
+                var self = this;
+
+                request('/Intro/find_pwd', {
+                    // email: self.email,
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        self.$root.navigate({
+                            path: '/find_pwd_reset',
+                            query: {
+                                usr_uid: result.usr_uid,
+                            }
+                        });
+                    } else if (result.code === self.$root.CONST.RES_ERROR_INFO_NO_EXIST) {
+                        self.$setState({
+                            err_msg: self.$root.lang['this_information_is_not_registered']
+                        });
+                    } else {
+                        self.$setState({
+                            err_msg: result.msg
+                        });
+                    }
+                })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                self.$setState({
+                    // email: self.$route.query.email,
+                });
+            }
+        }
+    }
+</script>

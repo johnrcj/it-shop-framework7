@@ -1,0 +1,158 @@
+<template>
+    <div class="page" data-name="qna">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['inquiry']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-30vw">
+            <div class="scroll-panel">
+                <div class="list accordion-list">
+                    <ul>
+                        {{#each this.list}}
+                        <li class="accordion-item">
+                            <a class="item-link item-content" href="#" @click="onResizeTextarea">
+                                <div class="item-inner">
+                                    <div class="item-title">{{this.title}}</div>
+                                    <div class="item-time right">{{this.reg_time}}</div>
+                                </div>
+                            </a>
+                            <div class="accordion-item-content">
+                                <div class="block">
+                                    <label class="label-title">{{this.self.$root.lang['question_desc']}}</label>
+
+                                    {{#each this.image_urls}}
+                                    {{#js_if 'this.length > 0'}}
+                                    <img src="{{this}}"/>
+                                    {{/js_if}}
+                                    {{/each}}
+                                    <div class="textarea-panel readonly">
+                                        <textarea class="text-3.5vw" readonly>{{this.content}}</textarea>
+                                    </div>
+
+                                    <label class="label-title theme-color">{{this.self.$root.lang['answer_desc']}}</label>
+
+                                    {{#js_if 'this.answer_image_url.length > 0'}}
+                                    <img src="{{this.answer_image_url}}"/>
+                                    {{/js_if}}
+                                    <div class="textarea-panel readonly">
+                                        <textarea class="text-3.5vw theme-color" readonly>{{this.answer_content}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="select-action-panel bottom-7vw pr-6vw pl-6vw">
+            <a @click="onWrite" class="button-panel">{{$root.lang['ask_question']}}</a>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                list: [],
+                textarea_resize: true,
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onKeyup: function (e) {
+                let self = this;
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/Mypage/get_qna_list', {
+                    usr_uid: self.$root.login_user.uid
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.coverQnaWithSelf(result);
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onWrite: function () {
+                var self = this;
+
+                self.$root.navigate({
+                    path: '/mypage/inquiry_write',
+                });
+            },
+
+            onResizeTextarea: function (e) {
+                var self = this;
+
+                if (self.textarea_resize) {
+                    $('[data-name=qna] textarea').each(function () {
+                        if ($(this).val() !== "")
+                            $(this).height($(this).prop('scrollHeight'));
+                    });
+
+                    self.$setState({
+                        textarea_resize: false
+                    });
+                }
+            },
+
+            coverQnaWithSelf: function (result) {
+                let self = this;
+
+                var list = [];
+                if (result.list.length > 0) {
+                    result.list.forEach((obj, idx) => {
+                        var item = obj;
+                        item['self'] = self;
+                        list.push(item);
+                    })
+                }
+
+                self.$setState({
+                    list: result.list
+                });
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+                self.loadPageInfo();
+            },
+
+            pageReinit: function(e) {
+                let self = this;
+
+                hideMainBottomMenu();
+                self.loadPageInfo();
+
+                self.$setState({
+                    textarea_resize: true
+                });
+            }
+        }
+    }
+</script>

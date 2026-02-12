@@ -1,0 +1,120 @@
+<template>
+    <div class="page" data-name="alarm">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['alarm_setting']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            <div class="option-panel">
+                <label class="label-desc w-full" id="alarm_desc">{{this.day}}{{$root.lang['days_ago']}} {{this.noon}} {{this.hour}}{{$root.lang['hour']}}</label>
+                <label class="item-checkbox switch-panel ml-auto">
+                    <input @change="onChangeAlarm" {{#js_if 'this.voucher_alarm == 1'}}checked{{/js_if}} type="checkbox" name="voucher_alarm"/>
+                    <i class="icon icon-switch"></i>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                day: "",
+                noon: "",
+                hour: "",
+                voucher_alarm: 0,
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onChangeAlarm: function(e) {
+                let self = this;
+
+                request('/Mypage/change_alarm', {
+                    usr_uid: self.$root.login_user.uid,
+                    status: e.target.checked ? 1 : 0,
+                    }, function(result) {
+                        if(result.code === self.$root.CONST.RES_SUCCESS) {
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            changeAlarmTime: function(day, noon, hour) {
+                let self = this;
+
+                self.$setState({
+                    day: (day+1).toString(),
+                    noon: noon === 0 ? self.$root.lang['am'] : self.$root.lang['pm'],
+                    hour: hour.toString(),
+                });
+
+                request('/Mypage/change_alarm_time', {
+                    usr_uid: self.$root.login_user.uid,
+                    time: day.toString() + ',' + noon.toString() + ',' + hour.toString(),
+                    }, function(result) {
+                        if(result.code === self.$root.CONST.RES_SUCCESS) {
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+
+                if (self.$route.query.voucher_alarm !== undefined) {
+                    self.$setState({
+                        voucher_alarm: self.$route.query.voucher_alarm,
+                    });
+                }
+
+                if (self.$route.query.voucher_alarm_time !== undefined) {
+                    times = self.$route.query.voucher_alarm_time.split(',');
+                    if (times.length >= 3) {
+                        self.$setState({
+                            day: parseInt(times[0]) + 1,
+                            noon: times[1] === '0' ? self.$root.lang['am'] : self.$root.lang['pm'],
+                            hour: times[2],
+                        });
+
+                        initAlarmPicker('alarm_desc', parseInt(times[0]), parseInt(times[1]), parseInt(times[2]), self.changeAlarmTime);
+                    } else {
+                        initAlarmPicker('alarm_desc', 0, 0, 0, self.changeAlarmTime);
+                    }
+                } else {
+                    initAlarmPicker('alarm_desc', 0, 0, 0, self.changeAlarmTime);
+                }
+            },
+
+            pageReinit: function(e) {
+                let self = this;
+
+                hideMainBottomMenu();
+            },
+        }
+    }
+</script>

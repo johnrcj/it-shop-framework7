@@ -1,0 +1,83 @@
+<template>
+    <div class="page" data-name="find_id_complete">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['find_id_complete']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            <div class="label-panel center mt-6vw">
+                <img src="assets/images/ic_lock_findpwd.png">
+            </div>
+
+            <div class="label-panel center">
+                <label class="label-desc center">{{$root.lang['we_have_found']}}</label>
+            </div>
+
+            <div class="label-panel center">
+                <label class="label-desc center">{{this.email_mask}}</label>
+            </div>
+
+            <div class="bottom-panel">
+                <a @click="onGotoLogin" class="button-panel">{{$root.lang['go_to_login']}}</a>
+
+                <a @click="onFindPassword" class="button-panel mt-2.5vw">{{$root.lang['find_password']}}</a>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                email: "",
+                email_mask: "",
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onInput: function (e) {
+                let self = this;
+                let name = e.target.name;
+                self[name] = e.target.value;
+            },
+
+            onFindPassword: function() {
+                var self = this;
+
+                self.$root.navigate({
+                    path: '/find_pwd',
+                    query: {
+                        email: self.email,
+                    }
+                });
+            },
+
+            onGotoLogin: function () {
+                this.$root.navigate('/login');
+            }
+        },
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                self.$setState({
+                    email: self.$route.query.email,
+                    email_mask: self.$route.query.email_mask,
+                });
+            }
+        }
+    }
+</script>

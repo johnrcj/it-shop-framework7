@@ -1,0 +1,173 @@
+<template>
+    <div class="page" data-name="voucher_detail">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['voucher_detail']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-30vw">
+            <div class="image-fill w-full h-full">
+                <img class="" src="{{this.image_url}}">
+            </div>
+        </div>
+
+        <div class="select-action-panel inline bottom-10vw px-5vw">
+            <a @click="onUseend" class="button button-raised button-white button-middle flex-1" >{{$root.lang['use_end']}}</a>
+            <a @click="onSend" class="button button-raised button-white button-middle ml-5vw flex-1">{{$root.lang['send']}}</a>
+            <a @click="onModify" class="button button-raised button-white button-middle ml-5vw flex-1">{{$root.lang['modify']}}</a>
+            <a @click="onDelete" class="button button-raised button-white button-middle ml-5vw flex-1">{{$root.lang['delete']}}</a>
+        </div>
+
+        <div class="select-action-panel text-center bottom-3vw px-5vw">
+            <div class="text-3.2vw">{{$root.lang['balance']}}({{this.price}}$)</div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                uid: 0,
+                image_url: "",
+                price: "0",
+            }
+        },
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onUseend: function(event) {
+               let self = this;
+
+               event.stopPropagation();
+
+                App_Dlg.confirm(
+                    self.$root.lang['end_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+                        request('/main/use_end', {
+                            user_id:self.$root.login_user.uid,
+                            id: self.uid,
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    showToast(self.$root.lang['use_item']);
+                                    back();
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    });
+           },
+
+            onSend: function(e) {
+                let self = this;
+
+                event.stopPropagation();
+
+                bridgeSendVoucher([self.image_url], function(result) {
+                    if (parseInt(result) === 1)
+                        showToast(self.$root.lang['voucher_send']);
+                    else
+                        showToast(self.$root.lang['voucher_send_failed']);
+                });
+            },
+            
+            onDelete: function(e) {
+                let self = this;
+
+                event.stopPropagation();
+
+                App_Dlg.confirm(
+                    self.$root.lang['delete_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+                        request('/main/delete_voucher', {
+                            user_id:self.$root.login_user.uid,
+                            id: self.uid,
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    showToast(self.$root.lang['delete_item']);
+                                    back();
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                     showToast(result.msg);
+                                }
+                            })
+                    });
+            },
+            
+            onModify: function(e) {
+                let self = this;
+
+                event.stopPropagation();
+
+                self.$root.navigate({
+                    path: '/main/voucher_edit',
+                    query: {
+                        uid: self.uid,
+                    }
+                });
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/Main/get_voucher_info', {
+                    user_id: self.$root.login_user.uid,
+                    id: self.uid
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            price = parseInt(result.info.price);
+                            self.$setState({
+                                image_url: result.info.image_url,
+                                price: price.toLocaleString('en-US'),
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+
+                if (self.$route.query.uid !== undefined) {
+                    self.$setState({
+                        uid: self.$route.query.uid,
+                    })
+                }
+
+                self.loadPageInfo();
+            },
+            
+            pageReinit: function(e) {                
+                let self = this;
+
+                hideMainBottomMenu();
+
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

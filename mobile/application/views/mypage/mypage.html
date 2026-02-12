@@ -1,0 +1,291 @@
+<template>
+    <div class="page" data-name="mypage">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative">
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['myconpang']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-wide-panel">
+            <div class="personal-info">
+                <div class="name-panel">{{this.name}}</div>
+                <div @click="onModifyInfo" class="info-panel">
+                    <label>{{$root.lang['modify_personal_info']}}</label>
+                    <img style="width: 2.5vw" src="assets/images/ic_more_right_green.png">
+                </div>
+            </div>
+
+            <div class="mypage-content-panel">
+                <div class="item-panel">
+                    <label class="item-title">{{$root.lang['lookup']}}</label>
+                    <div class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_capture.png">
+                        <label class="item-content-label">{{$root.lang['lookup_note']}} <span class="badge" @click="onLookup">!</span></i></label>
+                        <label class="item-checkbox switch-panel">
+                            <input @change="onChangeRecognition" {{#js_if 'this.register_auto == 1'}}checked{{/js_if}} type="checkbox" name="register_auto"/>
+                            <i class="icon icon-switch"></i>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="item-panel">
+                    <label class="item-title">{{$root.lang['general']}}</label>
+                    <div @click="onAlarm" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_alarm.png">
+                        <label class="item-content-label">{{$root.lang['alarm_setting']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                </div>
+
+                <div class="item-panel">
+                    <label class="item-title">{{$root.lang['info']}}</label>
+                    <div @click="onNotice" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_notice.png">
+                        <label class="item-content-label">{{$root.lang['notice']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                    <div @click="onUseTerm" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_terms.png">
+                        <label class="item-content-label">{{$root.lang['use_terms']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                </div>
+
+                <div class="item-panel">
+                    <label class="item-title">{{$root.lang['etc']}}</label>
+                    <div @click="onInvite" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_invite_friend.png">
+                        <label class="item-content-label">{{$root.lang['invite_friends']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                    <div @click="onInquiry" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_inquiry.png">
+                        <label class="item-content-label">{{$root.lang['inquiry']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                    <div @click="onLogout" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_logout.png">
+                        <label class="item-content-label">{{$root.lang['logout']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                    <div @click="onWithdraw" class="item-content">
+                        <img class="item-content-icon" src="assets/images/ic_withdraw.png">
+                        <label class="item-content-label">{{$root.lang['withdrawal']}}</label>
+                        <img class="item-content-more-icon" src="assets/images/ic_more_right_black.png">
+                    </div>
+                </div>
+
+                <div class="item-panel">
+                    <label class="item-title">{{$root.lang['ver_info']}}:</label>
+                    <label class="item-title">{{$root.lang['cur_ver']}}: v {{$root.app_version}} / </label>
+                    <label class="item-title">{{$root.lang['new_ver']}}: v {{this.new_version}}</label>
+
+                    {{#js_if 'this.update_need == true'}}
+                    <div @click="onUpdate" class="item-title">
+                        <label class="theme-color">{{$root.lang['version_update']}}</label>
+                    </div>
+                    {{/js_if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                name: "",
+                register_auto: 0,
+                voucher_alarm: 0,
+                voucher_alarm_time: "",
+                new_version: "",
+                update_need: false,
+                update_url: "",
+                share_url: "",
+                recognition_mark: "",
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            loadPageInfo: function() {
+                let self = this;
+
+                self.$setState({
+                    new_version: self.$root.app_version,
+                });
+
+                bridgeFetchVersion(function(version) {
+                    if (version !== "" && self.$root.app_version !== version) {
+                        self.$setState({
+                            update_need: true,
+                            new_version: version,
+                        });
+                    }
+                });
+
+                request('/Mypage/get_mypage_info', {
+                    usr_uid: self.$root.login_user.uid,
+                    usr_type: self.$root.login_user.usr_type,
+                    dev_type: isAndroid() ? 1 : 2,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                name: result.name,
+                                register_auto: result.register_auto,
+                                voucher_alarm: result.voucher_alarm,
+                                voucher_alarm_time: result.voucher_alarm_time,
+                                update_url: result.update_url,
+                                share_url: result.share_url,
+                                recognition_mark: result.recognition_mark,
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onModifyInfo: function () {
+                let self = this;
+
+                self.$root.navigate('/mypage/info_modify');
+            },
+
+            onLookup: function () {
+                let self = this;
+
+                if (self.recognition_mark !== "")
+                    showToast(self.recognition_mark, 10000);
+            },
+
+            onChangeRecognition: function (e) {
+                let self = this;
+
+                request('/Mypage/change_recognition', {
+                    usr_uid: self.$root.login_user.uid,
+                    type: e.target.name,
+                    status: e.target.checked ? 1 : 0,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onAlarm: function() {
+                let self = this;
+
+                this.$root.navigate({
+                    path: '/mypage/alarm',
+                    query: {
+                        voucher_alarm: self.voucher_alarm,
+                        voucher_alarm_time: self.voucher_alarm_time,
+                    }
+                });
+            },
+
+            onNotice: function() {
+                this.$root.navigate('/mypage/notice');
+            },
+
+            onUseTerm: function() {
+                this.$root.navigate('/mypage/useterm');
+            },
+
+            onInvite: function () {
+                let self = this;
+
+                bridgeInviteFriends(self.share_url);
+            },
+
+            onInquiry: function () {
+                this.$root.navigate('/mypage/inquiry');
+            },
+
+            onLogout: function (type) {
+                let self = this;
+
+                App_Dlg.confirm(self.$root.lang['logout_confirm'],
+                    self.$root.lang['confirm'],
+                    self.$root.lang['cancel'], function () {
+                        request('/Mypage/logout', {
+                            usr_uid: self.$root.login_user.uid,
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    bridgeLogout();
+                                    clearAndNavigateLoginPage();
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    }
+                )
+            },
+
+            onWithdraw: function (type) {
+                let self = this;
+
+                App_Dlg.confirm(self.$root.lang['withdrawal_confirm'],
+                    self.$root.lang['confirm'],
+                    self.$root.lang['cancel'], function () {
+                        request('/Mypage/withdrawal', {
+                            usr_uid: self.$root.login_user.uid,
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    bridgeLogout();
+                                    clearAndNavigateLoginPage();
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    }
+                )
+            },
+
+            onUpdate: function () {
+                let self = this;
+
+                bridgeGoUrl(self.update_url);
+            },
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                showMainBottomMenu();
+
+                self.loadPageInfo();
+            },
+
+            pageReinit: function(e) {
+                let self = this;
+
+                if (self.$root.prev_page_name === "mypage") {
+                    showMainBottomMenu();
+                }
+
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

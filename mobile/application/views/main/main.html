@@ -1,0 +1,800 @@
+<template>
+    <div class="page" data-name="main"
+        {{#js_if 'this.is_select_mode == true'}}select-mode="select"{{/js_if}}
+        {{#js_if 'this.is_search_mode == true'}}search-mode="search"{{/js_if}}>
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                {{#js_if 'this.is_search_mode == true'}}
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                {{/js_if}}
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['home']}}</div>
+                </div>
+                <div @click="onGoSearchPage" class="right link">
+                    <img class="ic_search" src="assets/images/ic_search_black.png">
+                </div>
+            </div>
+        </div>
+
+        <div @scroll="onScrollContent" class="page-content top-navbar-content-wide-panel pb-30vw back-gray">
+            {{#js_if 'this.is_select_mode == false'}}
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">
+                <span class="flex-1 text-3.2vw">{{$root.lang['available_cnt']}}{{this.available_count}}{{$root.lang['cnt']}}</span>
+                <div class="item-input-wrap input-dropdown-wrap flex items-center">
+                    <a class="smart-select smart-select-init w-full text-3.2vw" style="min-width: 29vw; text-align: right" data-open-in="sheet">
+                        <select @change="onFilterChange" id="filter" name="filter" class="input-with-value">
+                            <option value="registered">{{$root.lang['registered']}}</option>
+                            <option value="validity">{{$root.lang['validity']}}</option>
+                            <option value="brand">{{$root.lang['brand_name']}}</option>
+                        </select>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title"></div>
+                                <div class="item-after text-3.2vw color-heavy-gray"></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <img @click="onSwitchViewMode" class="ml-2vw" style="width: 7vw !important;" src="assets/images/btn_view_mode.png"/>
+            </div>
+            {{/js_if}}
+            {{#js_if 'this.is_select_mode == true'}}
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white my-0.8vw">
+                <span class="text-3.2vw text-bold color-light-green" @click="getOutSelectMode">{{$root.lang['cancel']}}</span>
+            </div>
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white underline">
+                <span class="text-3.2vw flex-1 text-center" @click="getOutSelectMode">{{this.sel_ids.length}} {{$root.lang['voucher_selected']}}</span>
+            </div>
+            {{/js_if}}
+            <div class="{{#js_if 'this.is_list_view == true'}}voucher-list{{/js_if}} {{#js_if 'this.is_list_view == false'}}voucher-tile{{/js_if}}">
+                {{#each this.available_list}}
+                <div class="voucher" id="voucher-{{this.uid}}" @click="onSelectVoucher({{this.uid}})">
+                    {{#js_if 'this.self.is_list_view == true'}}
+                    <div class="voucher-image">
+                        <img src="{{this.image_url}}">
+                    </div>
+                    <div class="voucher-info">
+                        <div class="others">
+                            <div class="where-use">{{#js_if 'this.where_use.length > 0'}}{{this.where_use}}{{/js_if}} {{#js_if 'this.where_use.length == 0'}}<br/>{{/js_if}}</div>
+                            <div class="remain-days">{{this.self.$root.lang['remain_days_prefix']}}{{this.remain_days}}</div>
+                        </div>
+                        <div class="name">{{#js_if 'this.name.length > 0'}}{{this.name}}{{/js_if}} {{#js_if 'this.name.length == 0'}}<br/>{{/js_if}}</div>
+                        <div class="period">{{this.expire_date}} {{this.self.$root.lang['until']}}</div>
+                        <div class="buttons">
+                            <a class="info-button" @click="onSelectItemEnd({{this.uid}})">{{this.self.$root.lang['use_end']}}</a>
+                            <a class="info-button ml-2vw" @click="onSelectItemSend('{{this.image_url}}')">{{this.self.$root.lang['send']}}</a>
+                            <div class="remove-button">
+                                <img src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})">
+                            </div>
+                        </div>
+                    </div>
+                    {{/js_if}}
+
+                    {{#js_if 'this.self.is_list_view == false'}}
+                    <div class="voucher-block">
+                        <div class="voucher-others">
+                            <div class="remain-days">{{this.self.$root.lang['remain_days_prefix']}}{{this.remain_days}}</div>
+                            <div class="remove-button">
+                                <img src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})">
+                            </div>
+                        </div>
+                        <div class="voucher-image">
+                            <img src="{{this.image_url}}">
+                        </div>
+                        <div class="voucher-info">
+                            <div class="others">
+                                <div class="where-use">{{#js_if 'this.where_use.length > 0'}}{{this.where_use}}{{/js_if}} {{#js_if 'this.where_use.length == 0'}}<br/>{{/js_if}}</div>
+                            </div>
+                            <div class="name">{{#js_if 'this.name.length > 0'}}{{this.name}}{{/js_if}} {{#js_if 'this.name.length == 0'}}<br/>{{/js_if}}</div>
+                            <div class="period">{{this.expire_date}} {{this.self.$root.lang['until']}}</div>
+                            <div class="buttons">
+                                <a class="info-button" @click="onSelectItemEnd({{this.uid}})">{{this.self.$root.lang['use_end']}}</a>
+                                <a class="info-button ml-2vw" @click="onSelectItemSend('{{this.image_url}}')">{{this.self.$root.lang['send']}}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {{/js_if}}
+
+                    <div class="select-area items-center justify-center">
+                        <div>
+                            <img src="assets/images/ic_checked.png"/>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+
+            </div>
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">
+                <span class="flex-1 text-3.2vw text-center color-gray">{{$root.lang['used_gift_voucher']}}{{this.use_end_count}}{{$root.lang['cnt']}}</span>
+            </div>
+            <div class="{{#js_if 'this.is_list_view == true'}}voucher-list{{/js_if}} {{#js_if 'this.is_list_view == false'}}voucher-tile{{/js_if}}">
+                {{#each this.use_end_list}}
+                <div class="voucher" id="voucher-end-{{this.uid}}">
+                    {{#js_if 'this.self.is_list_view == true'}}
+                    <div class="voucher-image">
+                        <img src="{{this.image_url}}">
+                    </div>
+                    <div class="voucher-info">
+                        <div class="others">
+                            <div class="where-use">{{#js_if 'this.where_use.length > 0'}}{{this.where_use}}{{/js_if}} {{#js_if 'this.where_use.length == 0'}}<br/>{{/js_if}}</div>
+                            <div class="remain-days">{{this.self.$root.lang['remain_days_prefix']}}{{this.remain_days}}</div>
+                        </div>
+                        <div class="name">{{#js_if 'this.name.length > 0'}}{{this.name}}{{/js_if}} {{#js_if 'this.name.length == 0'}}<br/>{{/js_if}}</div>
+                        <div class="period">{{this.expire_date}} {{this.self.$root.lang['until']}}</div>
+                        <div class="buttons">
+                            <a @click="onSelectItemEndCancel({{this.uid}})" class="info-button use-end-button">{{this.self.$root.lang['use_end_cancel']}}</a>
+                            <div class="remove-button">
+                                <img src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})">
+                            </div>
+                        </div>
+                    </div>
+                    {{/js_if}}
+
+                    {{#js_if 'this.self.is_list_view == false'}}
+                    <div class="voucher-block">
+                        <div class="voucher-others">
+                            <div class="remain-days">{{this.self.$root.lang['remain_days_prefix']}}{{this.remain_days}}</div>
+                            <div class="remove-button">
+                                <img src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})">
+                            </div>
+                        </div>
+                        <div class="voucher-image">
+                            <img src="{{this.image_url}}">
+                        </div>
+                        <div class="voucher-info">
+                            <div class="others">
+                                <div class="where-use">{{#js_if 'this.where_use.length > 0'}}{{this.where_use}}{{/js_if}} {{#js_if 'this.where_use.length == 0'}}<br/>{{/js_if}}</div>
+                            </div>
+                            <div class="name">{{#js_if 'this.name.length > 0'}}{{this.name}}{{/js_if}} {{#js_if 'this.name.length == 0'}}<br/>{{/js_if}}</div>
+                            <div class="period">{{this.expire_date}} {{this.self.$root.lang['until']}}</div>
+                            <div class="buttons">
+                                <a @click="onSelectItemEndCancel({{this.uid}})" class="info-button use-end-button">{{this.self.$root.lang['use_end_cancel']}}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {{/js_if}}
+
+                    <div class="mask-area"></div>
+                    <div class="select-area items-center justify-center">
+                        <div>
+                            <img src="assets/images/ic_checked.png"/>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">
+                <span class="flex-1 text-3.2vw text-center color-gray">{{$root.lang['expired_gift_voucher_cnt']}}{{this.expired_count}}{{$root.lang['cnt']}}</span>
+            </div>
+            <div class="mb-1.5vw {{#js_if 'this.is_list_view == true'}}voucher-list{{/js_if}} {{#js_if 'this.is_list_view == false'}}voucher-tile{{/js_if}}">
+                {{#each this.expired_list}}
+                <div class="voucher" id="voucher-expire-{{this.uid}}">
+                    {{#js_if 'this.self.is_list_view == true'}}
+                    <div class="voucher-image">
+                        <img src="{{this.image_url}}">
+                    </div>
+                    <div class="voucher-info">
+                        <div class="others">
+                            <div class="where-use">{{#js_if 'this.where_use.length > 0'}}{{this.where_use}}{{/js_if}} {{#js_if 'this.where_use.length == 0'}}<br/>{{/js_if}}</div>
+                            <div class="expire-days">{{this.self.$root.lang['expired_gift_voucher']}}</div>
+                        </div>
+                        <div class="name">{{#js_if 'this.name.length > 0'}}{{this.name}}{{/js_if}} {{#js_if 'this.name.length == 0'}}<br/>{{/js_if}}</div>
+                        <div class="period"><br/></div>
+                        <div class="buttons">
+                            <div class="remove-button">
+                                <img src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})">
+                            </div>
+                        </div>
+                    </div>
+                    {{/js_if}}
+
+                    {{#js_if 'this.self.is_list_view == false'}}
+                    <div class="voucher-block">
+                        <div class="voucher-others">
+                            <div class="expire-days">{{this.self.$root.lang['expired_gift_voucher']}}</div>
+                            <div class="remove-button">
+                                <img src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})">
+                            </div>
+                        </div>
+                        <div class="voucher-image">
+                            <img src="{{this.image_url}}">
+                        </div>
+                        <div class="voucher-info">
+                            <div class="others">
+                                <div class="where-use">{{#js_if 'this.where_use.length > 0'}}{{this.where_use}}{{/js_if}} {{#js_if 'this.where_use.length == 0'}}<br/>{{/js_if}}</div>
+                            </div>
+                            <div class="name">{{#js_if 'this.name.length > 0'}}{{this.name}}{{/js_if}} {{#js_if 'this.name.length == 0'}}<br/>{{/js_if}}</div>
+                            <div class="period"><br/></div>
+                        </div>
+                    </div>
+                    {{/js_if}}
+
+                    <div class="mask-area"></div>
+                    <div class="select-area items-center justify-center">
+                        <div>
+                            <img src="assets/images/ic_checked.png"/>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        {{#js_if 'this.is_select_mode == false'}}
+        <div class="fab-button bottom-20vw right-5vw">
+          <a href="#" class="" @click="onShowFabPanel" id="add-button">
+              <img name="fab_open" src="assets/images/btn_add.png">
+<!--            <i class="f7-icon">add</i>-->
+          </a>
+        </div>
+        <div class="fab-panel hide">
+            <div class="fab-buttons flex flex-col">
+                {{#js_if 'this.register_auto == 1'}}
+                <a class="fab-circle-button" @click="onAutoReg">{{$root.lang['coupon_auto_re']}}</a>
+                {{/js_if}}
+                <a class="fab-circle-button" @click="getIntoSelectMode">{{$root.lang['gift_voucher_select']}}</a>
+                <a class="fab-circle-button" @click="onVoucherReg">{{$root.lang['gift_voucher_reg']}}</a>
+            </div>
+        </div>
+        {{/js_if}}
+        {{#js_if 'this.is_select_mode == true'}}
+        <div class="select-action-panel inline bottom-20vw flex px-5vw">
+            <a class="button button-raised button-white button-middle flex-1" @click="onSelectItemsEnd">{{$root.lang['use_end']}}</a>
+            <a class="button button-raised button-white button-middle ml-5vw flex-1" @click="onSelectItemsSend">{{$root.lang['send']}}</a>
+            <a class="button button-raised button-white button-middle ml-5vw flex-1" @click="onSelectItemsDelete">{{$root.lang['delete']}}</a>
+        </div>
+        {{/js_if}}
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                is_list_view: true,
+                is_select_mode: false,
+                sel_ids: [],
+                available_list: [],
+                expired_list: [],
+                use_end_list: [],
+                available_count: 0,
+                use_end_count: 0,
+                expired_count: 0,
+                search_key : '',
+                is_search_mode: false,
+				register_auto: 0,
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                let self = this;
+
+                self.$setState({
+                    search_key : '',
+                    is_search_mode : false,
+                });
+
+                if (self.is_select_mode) {
+                    $(".voucher-selected").removeClass('voucher-selected');
+                    self.$setState({
+                        is_select_mode : false,
+                        sel_ids : []
+                    });
+                }
+
+                self.loadPageInfo();
+            },
+
+            onScrollContent: function(e) {
+                let self = this;
+
+                self.$setState({
+                    scrollTop: $(e.target).scrollTop(),
+                });
+            },
+
+            onSwitchViewMode: function(e) {
+                let self = this;
+
+                self.$setState({
+                    is_list_view: !self.is_list_view
+                })  
+            },
+
+            onScrollTop: function(e) {
+                $(e.target).closest(".page-content").scrollTop(0);
+                this.$setState({
+                    scrollTop: 0,
+                });
+            },
+
+            onGoSearchPage: function () {
+                let self = this;
+
+                $('[data-name=search]').remove();
+                self.$root.navigate({
+                    path: '/main/search',
+                    query: {
+                        search_key :self.search_key}
+                });
+            },
+
+            onShowFabPanel: function() {
+                if ($(".fab-panel").hasClass('fab-opened')) {
+                    $(".fab-panel").removeClass('fab-opened');
+                    $(".fab-panel").addClass('hide');
+                    $('[data-name=main] img[name=fab_open]').removeClass('close');
+                } else {
+                    $(".fab-panel").addClass('fab-opened');
+                    $(".fab-panel").removeClass('hide');
+                    $('[data-name=main] img[name=fab_open]').addClass('close');
+                }
+            },
+
+            getIntoSelectMode: function(e) {
+                e.stopPropagation();
+
+                let self = this;
+
+                $(".fab-panel").removeClass('fab-opened');
+                $(".fab-panel").addClass('hide');
+                self.$setState({
+                    is_select_mode : true
+                })  
+            },
+
+            getOutSelectMode: function() {
+                let self = this;
+
+                $(".voucher-selected").removeClass('voucher-selected');
+                self.$setState({
+                    is_select_mode : false,
+                    sel_ids : []
+                });
+            },
+
+            getOutSearchMode: function() {
+                let self = this;
+
+                self.$setState({
+                    search_key : '',
+                    is_search_mode : false,
+                });
+
+                if (self.is_select_mode) {
+                    $(".voucher-selected").removeClass('voucher-selected');
+                    self.$setState({
+                        is_select_mode : false,
+                        sel_ids : []
+                    });
+                }
+
+                self.loadPageInfo();
+            },
+
+            onAutoReg: function(e) {
+                e.stopPropagation();
+                let self = this;
+                self.$root.navigate('/main/auto_reg');
+                $(".fab-panel").removeClass('fab-opened');
+                $(".fab-panel").addClass('hide');
+            },
+
+            onVoucherReg: function(e) {
+                e.stopPropagation();
+                let self = this;
+                self.$root.navigate('/main/voucher_edit');
+                $(".fab-panel").removeClass('fab-opened');
+                $(".fab-panel").addClass('hide');
+            },
+
+            onSelectVoucher: function(uid) {
+                let self = this;
+
+                if (self.is_select_mode === false) {
+                    this.$root.navigate({
+                        path: '/main/detail',
+                        query: {
+                            uid: uid,
+                        }
+                    })
+                    return;
+                }
+
+                var ids = self.sel_ids;
+                if ($("#voucher-" + uid).hasClass('voucher-selected') === true) {
+                    ids = ids.filter(function(id) { return id !== parseInt(uid);})
+                    $("#voucher-" + uid).removeClass('voucher-selected');
+                } else {
+                    console.log("aa");
+                    ids.push(uid);
+                    $("#voucher-" + uid).addClass('voucher-selected');
+                }
+
+                self.$setState({
+                    sel_ids : ids
+                })  
+            },
+
+            onFilterChange: function() {
+                let self = this;
+
+                request('/main/get_home_info', {
+                    user_id:self.$root.login_user.uid,
+                    type: $("#filter").val()
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.coverVoucherWithSelf(result);
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onSelectItemEnd: function(uid) {
+                let self = this;
+
+                event.stopPropagation();
+
+                App_Dlg.confirm(
+                    self.$root.lang['end_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+                        request('/main/use_end', {
+                            user_id:self.$root.login_user.uid,
+                            id: uid,
+                            type: $("#filter").val()
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    self.coverVoucherWithSelf(result);
+                                    showToast(self.$root.lang['use_item']);
+
+                                    self.$setState({
+                                        sel_ids : []
+                                    })
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    });
+            },
+
+            onSelectItemSend: function(url) {
+                let self = this;
+
+                event.stopPropagation();
+
+                bridgeSendVoucher([url], function(result) {
+                    if (parseInt(result) === 1)
+                        showToast(self.$root.lang['voucher_send']);
+                    else
+                        showToast(self.$root.lang['voucher_send_failed']);
+                });
+            },
+
+            onSelectItemDelete: function(uid) {
+                let self = this;
+
+                event.stopPropagation();
+
+                App_Dlg.confirm(
+                    self.$root.lang['delete_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+                        request('/main/delete_voucher', {
+                            user_id:self.$root.login_user.uid,
+                            id: uid,
+                            type: $("#filter").val()
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    self.coverVoucherWithSelf(result);
+                                    showToast(self.$root.lang['delete_item']);
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    });
+            },
+
+            onSelectItemsEnd: function(event) {
+               let self = this;
+
+               event.stopPropagation();
+
+               if (self.sel_ids.length === 0) {
+                   return;
+               }
+
+               let ids = '';
+               for (var i = 0;i < self.sel_ids.length;i++) {
+                    ids = ids + self.sel_ids[i] + ",";
+               }
+               ids = ids.substr(0, ids.length - 1);
+                
+               App_Dlg.confirm(
+                   self.$root.lang['end_desc'],
+                   self.$root.lang['yes'],
+                   self.$root.lang['no'], function () {
+                       request('/main/use_end', {
+                           user_id:self.$root.login_user.uid,
+                           id:  ids,
+                           type: $("#filter").val()
+                           }, function(result) {
+                               if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                   self.coverVoucherWithSelf(result);
+                                   showToast(self.$root.lang['use_item']);
+
+                                   self.$setState({
+                                       sel_ids : []
+                                   })
+                               } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                   showToast(self.$root.lang['block_user_error']);
+                                   clearAndNavigateLoginPage();
+                               } else {
+                                   showToast(result.msg);
+                               }
+                           })
+                   });
+           },
+
+            onSelectItemsSend: function(event) {
+                let self = this;
+
+                event.stopPropagation();
+
+                if (self.sel_ids.length === 0) {
+                    return;
+                }
+
+                let urls = [];
+                for (var i = 0;i < self.sel_ids.length; i++) {
+                    var item = self.available_list.find(item => parseInt(item.uid) === parseInt(self.sel_ids[i]));
+                    if (item !== null)
+                        urls.push(item.image_url);
+                }
+
+                bridgeSendVoucher(urls, function(result) {
+                    if (parseInt(result) === 1)
+                        showToast(self.$root.lang['voucher_send']);
+                    else
+                        showToast(self.$root.lang['voucher_send_failed']);
+                });
+            },
+
+            onSelectItemsDelete: function(e) {
+                let self = this;
+                event.stopPropagation();
+
+                if (self.sel_ids.length === 0) {
+                    return;
+                }
+
+                let ids = '';
+                for (var i = 0;i < self.sel_ids.length;i++) {
+                    ids = ids + self.sel_ids[i] + ",";
+                }
+                ids = ids.substr(0, ids.length - 1);
+
+                App_Dlg.confirm(
+                   self.$root.lang['delete_desc'],
+                   self.$root.lang['yes'],
+                   self.$root.lang['no'], function () {
+                       request('/main/delete_voucher', {
+                           user_id:self.$root.login_user.uid,
+                           id: ids,
+                           type: $("#filter").val()
+                           }, function(result) {
+                               if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                   self.coverVoucherWithSelf(result);
+                                   showToast(self.$root.lang['delete_item']);
+                               } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                   showToast(self.$root.lang['block_user_error']);
+                                   clearAndNavigateLoginPage();
+                               } else {
+                                   showToast(result.msg);
+                               }
+                           })
+                   });
+            },
+
+            onSelectItemEndCancel: function(uid) {
+                let self = this;
+
+                event.stopPropagation();
+
+                App_Dlg.confirm(
+                    self.$root.lang['end_cancel_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+                        request('/main/use_end_cancel', {
+                            user_id:self.$root.login_user.uid,
+                            id: uid,
+                            type: $("#filter").val()
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    self.coverVoucherWithSelf(result);
+                                    showToast(self.$root.lang['use_item']);
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    });
+            },
+
+            onSelectItemsEndCancel: function(event) {
+                let self = this;
+
+                event.stopPropagation();
+
+                let ids = '';
+                for (var i = 0;i < self.sel_ids.length;i++) {
+                    ids = ids + self.sel_ids[i] + ",";
+                }
+                ids = ids.substr(0, ids.length - 1);
+
+                App_Dlg.confirm(
+                    self.$root.lang['end_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+                        request('/main/use_end', {
+                            user_id:self.$root.login_user.uid,
+                            id: ids,
+                            type: $("#filter").val()
+                            }, function(result) {
+                                if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                    self.coverVoucherWithSelf(result);
+                                    showToast(self.$root.lang['use_item']);
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    });
+            },
+
+            loadPageInfo: function() {
+                let self = this;
+
+                request('/Main/get_home_info', {
+                    user_id: self.$root.login_user.uid,
+                    type: $("#filter").val(),
+                    search_key: self.search_key,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.coverVoucherWithSelf(result);
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            coverVoucherWithSelf: function (result) {
+                let self = this;
+
+                var available_list = [];
+                if (result.available_list.length > 0) {
+                    result.available_list.forEach((obj, idx) => {
+                        var item = obj;
+                        item['self'] = self;
+                        available_list.push(item);
+                    })
+                }
+
+                var use_end_list = [];
+                if (result.use_end_list.length > 0) {
+                    result.use_end_list.forEach((obj, idx) => {
+                        var item = obj;
+                        item['self'] = self;
+                        use_end_list.push(item);
+                    })
+                }
+
+                var expired_list = [];
+                if (result.expired_list.length > 0) {
+                    result.expired_list.forEach((obj, idx) => {
+                        var item = obj;
+                        item['self'] = self;
+                        expired_list.push(item);
+                    })
+                }
+
+                self.$setState({
+                    available_count: result.available_count,
+                    use_end_count: result.use_end_count,
+                    expired_count: result.expired_count,
+                    available_list: available_list,
+                    use_end_list: use_end_list,
+                    expired_list: expired_list,
+                    register_auto: result.register_auto,
+                });
+            },
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                showMainBottomMenu();
+                self.$root.current_obj = self;
+
+                if (self.$route.query.search_key !== undefined) {
+                    if (self.$route.query.search_key != '') {
+                        self.$setState({
+                            search_key : self.$route.query.search_key,
+                            is_search_mode : true,
+                        });
+                    } else {
+                        self.$setState({
+                            search_key : '',
+                            is_search_mode : false,
+                        });
+                    }
+                } else {
+                    self.$setState({
+                        search_key : '',
+                        is_search_mode : false,
+                    });
+                }
+
+                self.loadPageInfo();
+            },
+            
+            pageReinit: function(e) {
+                let self = this;
+
+                if (self.$root.prev_page_name === "main") {
+                    showMainBottomMenu();
+                }
+
+                $(".voucher-selected").removeClass('voucher-selected');
+                $('[data-name=main] img[name=fab_open]').removeClass('close');
+
+                self.$setState({
+                    is_select_mode : false,
+                    sel_ids : [],
+                });
+
+                if (self.$route.query.search_key !== undefined) {
+                    if (self.$route.query.search_key != '') {
+                        self.$setState({
+                            search_key : self.$route.query.search_key,
+                            is_search_mode : true,
+                        });
+                    } else {
+                        self.$setState({
+                            search_key : '',
+                            is_search_mode : false,
+                        });
+                    }
+
+                } else {
+                    self.$setState({
+                        search_key : '',
+                        is_search_mode : false,
+                    });
+                }
+
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

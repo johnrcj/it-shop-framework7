@@ -1,0 +1,560 @@
+<template>
+    <div class="page" data-name="signup">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['signup']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            {{#js_if 'this.usr_type == 1 || this.usr_type == 3'}}
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['enter_phone_num_or_email']}}</label>
+            </div>
+
+            <div class="input-with-button-panel multiline">
+                <input name="email" maxlength="20" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['enter_phone_num_or_email_placeholder']}}</span>
+                <span class="input-clear-button"></span>
+                <a @click="onCheckId">{{$root.lang['double_check']}}</a>
+            </div>
+
+            <div class="label-panel mt-6vw">
+                <label class="label-desc">{{$root.lang['enter_password']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input type="password" name="pwd" maxlength="20" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['enter_password_placeholder']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel mt-6vw">
+                <label class="label-desc">{{$root.lang['check_your_password']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input type="password" name="pwd_confirm" maxlength="20" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['check_your_password_placeholder']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+            {{/js_if}}
+
+            <div class="label-panel mt-6vw">
+                <label class="label-desc">{{$root.lang['enter_mobile_phone']}}</label>
+            </div>
+
+            <div class="input-with-button-panel multiline">
+                <input name="phone" type="tel" maxlength="20" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['enter_mobile_phone_placeholder']}}</span>
+                <span class="input-clear-button"></span>
+                <a @click="onCheckPhone">{{$root.lang['identity_verification']}}</a>
+            </div>
+
+            {{#js_if 'this.term_nes_title.length > 0 || this.term_opt_title.length > 0'}}
+            <div class="label-panel underline  mt-4vw">
+                <label class="label-desc ">{{$root.lang['terms']}}</label>
+            </div>
+            {{/js_if}}
+
+            {{#js_if 'this.term_nes_title.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onChangeTerms" type="checkbox" name="term_nes" value="necessary"/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onNecessaryTerms' class="item-title">{{this.term_nes_title}}({{$root.lang['terms_necessary']}})</div>
+            </div>
+            {{/js_if}}
+
+            {{#js_if 'this.term_opt_title.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onChangeTerms" type="checkbox" name="term_opt" value="optional"/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onOptionalTerms' class="item-title">{{this.term_opt_title}}({{$root.lang['terms_optional']}})</div>
+            </div>
+            {{/js_if}}
+
+            <div class="label-panel mt-6vw">
+                <label class="label-desc theme-color">{{this.err_msg}}</label>
+            </div>
+
+            <a name="signup" @click="onSignup" class="button-panel mt-6vw disabled">{{$root.lang['join']}}</a>
+
+            <a name="go_login" @click="onLogin" class="button-panel mt-6vw hidden">{{$root.lang['go_to_login']}}</a>
+
+            <a name="find_pwd" @click="onFindPassword" class="button-panel mt-6vw hidden">{{$root.lang['find_password']}}</a>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                email: "",
+                pwd: "",
+                pwd_confirm: "",
+                phone: "",
+                usr_type: 1,
+                name: "",
+
+                id_valid: false,
+                pwd_valid: false,
+                pwd_match: false,
+                phone_valid: false,
+
+                term_nes: false,
+                term_opt: false,
+                term_nes_title: "",
+                term_opt_title: "",
+            }
+        },
+
+        methods: {            
+            onBack: function () {
+                back();
+            },
+
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+            },
+
+            onInput: function (e) {
+                let self = this;
+
+                let name = e.target.name;
+                var maxlength = e.target.maxLength;
+                if (maxlength > 0 && e.target.value.length > maxlength) {
+                    $('[data-name=signup] input[name=' + name + ']').val(e.target.value.substring(0, maxlength));
+                    return;
+                }
+
+                self[name] = e.target.value;
+
+                if (name === "email") {
+                    if (self.email) {
+                        let value = e.target.value;
+                        if (!validateEmail(value) && !validateEmailPhone((value)))
+                            self.$setState({
+                                id_valid: false,
+                                err_msg : self.$root.lang['this_is_unavailable_email'],
+                            });
+                        else {
+                            self.$setState({
+                                id_valid: true,
+                                err_msg : "",
+                            });
+                        }
+                    } else {
+                        self.$setState({
+                            err_msg : "",
+                        });
+                    }
+                } else if (name === "pwd") {
+                    if (self.pwd) {
+                        let value = e.target.value;
+                        if (validPwd(value)) {
+                            self.$setState({
+                                pwd_valid: true,
+                                err_msg: self.$root.lang['this_is_available_pwd']
+                            });
+                        } else {
+                            if (value.length < 8)
+                                self.$setState({
+                                    pwd_valid: false,
+                                    err_msg: self.$root.lang['password_is_too_short']
+                                });
+                            else if (value.length > 16)
+                                self.$setState({
+                                    pwd_valid: false,
+                                    err_msg: self.$root.lang['password_is_too_long']
+                                });
+                            else
+                                self.$setState({
+                                    pwd_valid: false,
+                                    err_msg: self.$root.lang['this_is_unavailable_password']
+                                });
+                        }
+
+                        let pwd_confirm = $('[data-name=signup] input[name=pwd_confirm]').val();
+                        if (pwd_confirm) {
+                            if (value !== pwd_confirm) {
+                                self.$setState({
+                                    pwd_match: false,
+                                    err_msg: self.$root.lang['passwords_do_not_match']
+                                });
+                            } else {
+                                self.$setState({
+                                    pwd_match: true,
+                                    err_msg: self.$root.lang['passwords_match']
+                                });
+                            }
+                        }
+                    } else {
+                        self.$setState({
+                            err_msg : "",
+                        });
+                    }
+                } else if (name === "pwd_confirm") {
+                    if (self.pwd_confirm) {
+                        let value = e.target.value;
+                        let pwd = $('[data-name=signup] input[name=pwd]').val();
+
+                        if (pwd) {
+                            if (value !== pwd) {
+                                self.$setState({
+                                    pwd_match: false,
+                                    err_msg: self.$root.lang['passwords_do_not_match']
+                                });
+                            } else {
+                                if (value.length < 8)
+                                    self.$setState({
+                                        pwd_valid: false,
+                                        err_msg: self.$root.lang['password_is_too_short']
+                                    });
+                                else if (value.length > 16)
+                                    self.$setState({
+                                        pwd_valid: false,
+                                        err_msg: self.$root.lang['password_is_too_long']
+                                    });
+                                else
+                                    self.$setState({
+                                        pwd_match: true,
+                                        err_msg: self.$root.lang['passwords_match']
+                                    });
+                            }
+                        }
+                    } else {
+                        self.$setState({
+                            err_msg : "",
+                        });
+                    }
+                } else if (name === "phone") {
+                    if (self.phone) {
+                        let value = e.target.value;
+                        if (!validatePhone(value))
+                            self.$setState({
+                                phone_valid: false,
+                                err_msg : self.$root.lang['this_is_unavailable_phone'],
+                            });
+                        else {
+                            self.$setState({
+                                phone_valid: true,
+                                err_msg : "",
+                            });
+                        }
+                    } else {
+                        self.$setState({
+                            err_msg : "",
+                        });
+                    }
+                }
+
+                // check validation of all fields
+                $('[data-name=signup] a[name=signup]').removeClass("hidden");
+                $('[data-name=signup] a[name=go_login]').addClass("hidden");
+                $('[data-name=signup] a[name=find_pwd]').addClass("hidden");
+
+                if (self.validateParam()) {
+                    $('[data-name=signup] a[name=signup]').removeClass("disabled");
+                } else {
+                    $('[data-name=signup] a[name=signup]').addClass("disabled");
+                }
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+                if (e.keyCode === 13) {
+                    let name = e.target.name;
+                    if (name === "pwd") {
+                        $('[data-name=signup] input[name=pwd_confirm]').focus();
+                    } else if (name === "pwd_confirm") {
+                        $('[data-name=signup] input[name=name]').focus();
+                    } else if (name === "phone") {
+                        $('[data-name=signup] input[name=phone]').focus();
+                    }
+                }
+            },
+
+            onChangeTerms: function(e) {
+                let self = this;
+                let name = e.target.name;
+
+                self[name] = e.target.checked;
+
+                // check validation of all fields
+                $('[data-name=signup] a[name=signup]').removeClass("hidden");
+                $('[data-name=signup] a[name=go_login]').addClass("hidden");
+                $('[data-name=signup] a[name=find_pwd]').addClass("hidden");
+
+                if (self.validateParam()) {
+                    $('[data-name=signup] #ipt_email_type')
+                    $('[data-name=signup] a[name=signup]').removeClass("disabled");
+                } else {
+                    $('[data-name=signup] a[name=signup]').addClass("disabled");
+                }
+            },
+
+            onCheckId: function() {
+                let self = this;
+
+                if (self.email === "") {
+                    self.$setState({
+                        err_msg: self.$root.lang['enter_phone_num_or_email'],
+                    });
+
+                    $('[data-name=signup] input[name=email]').focus();
+                    startShakeAnim($('[data-name=signup] input[name=email]'));
+
+                    return;
+                }
+
+                if (!self.id_valid) {
+                    self.$setState({
+                        err_msg: self.$root.lang['this_is_unavailable_email'],
+                    });
+
+                    $('[data-name=signup] input[name=email]').focus();
+                    startShakeAnim($('[data-name=signup] input[name=email]'));
+
+                    return;
+                }
+
+                request('/Intro/check_email', {
+                    email: self.email,
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        self.$setState({
+                            id_valid: true,
+                            err_msg: self.$root.lang['this_id_valid']
+                        });
+                    } else if (result.code === self.$root.CONST.RES_ERROR_DUPLICATE) {
+                        self.$setState({
+                            id_valid: false,
+                            err_msg: self.$root.lang['this_id_duplicated']
+                        });
+                    } else {
+                        self.$setState({
+                            id_valid: false,
+                            err_msg: result.msg,
+                        });
+                    }
+                })
+            },
+
+            onCheckPhone: function() {
+                let self = this;
+
+                if (self.phone === "") {
+                    self.$setState({
+                        err_msg: self.$root.lang['enter_mobile_phone'],
+                    });
+
+                    $('[data-name=signup] input[name=phone]').focus();
+                    startShakeAnim($('[data-name=signup] input[name=phone]'));
+
+                    return;
+                }
+
+                if (!self.phone_valid) {
+                    self.$setState({
+                        err_msg: self.$root.lang['this_is_unavailable_phone'],
+                    });
+
+                    $('[data-name=signup] input[name=phone]').focus();
+                    startShakeAnim($('[data-name=signup] input[name=phone]'));
+
+                    return;
+                }
+
+                request('/Intro/check_phone', {
+                    phone: self.phone,
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_ERROR_DUPLICATE) {
+                        self.$setState({
+                            err_msg: self.$root.lang['this_is_already_registered_phone'],
+                        });
+
+                        $('[data-name=signup] a[name=signup]').addClass("hidden");
+                        $('[data-name=signup] a[name=go_login]').removeClass("hidden");
+                        $('[data-name=signup] a[name=find_pwd]').removeClass("hidden");
+                    } else {
+                        self.$setState({
+                            err_msg: self.$root.lang['this_is_valid_phone'],
+                        });
+
+                        $('[data-name=signup] a[name=signup]').removeClass("hidden");
+                        $('[data-name=signup] a[name=go_login]').addClass("hidden");
+                        $('[data-name=signup] a[name=find_pwd]').addClass("hidden");
+
+                    }
+                })
+            },
+
+            onSignup: function() {
+                let self = this;
+
+                if (!self.id_valid) {
+                    self.$setState({
+                        err_msg: self.$root.lang['check_your_id_duplication']
+                    });
+                    return false;
+                }
+
+                request('Intro/signup', {
+                    usr_type: self.usr_type,
+                    email: self.email,
+                    name: self.name,
+                    pwd: self.pwd,
+                    phone: self.phone,
+                    devType: isAndroid() ? 1 : 2,
+                    fcm_token: self.$root.fcm_token,
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        showToast(self.$root.lang['finished_signup']);
+
+                        self.$root.login_user.uid = result.usr_uid;
+                        self.$root.login_user.usr_type = self.usr_type;
+
+                        bridgeLoginSuccess(self.usr_type, self.email, self.pwd);
+
+                        changeBottomMenuSelected(1);
+                        $('[data-name=main]').remove();
+                        self.$root.navigate('/main');
+                    } else {
+                        self.$setState({
+                            err_msg: result.msg,
+                        });
+                    }
+                })
+            },
+
+            onLogin: function() {
+                let self = this;
+
+                self.$root.navigate("/login");
+            },
+
+            onFindPassword: function() {
+                let self = this;
+
+                self.$root.navigate("/find_pwd");
+            },
+
+            onNecessaryTerms: function(tab) {
+                this.$root.navigate({
+                    path: '/signup_term',
+                    query: {
+                        tab: 'necessary',
+                    }
+                })
+            },
+
+            onOptionalTerms: function(tab) {
+                this.$root.navigate({
+                    path: '/signup_term',
+                    query: {
+                        tab: 'optional',
+                    }
+                })
+            },
+
+            loadPageInfo: function() {
+                let self = this;
+
+                request('Term/get_signup_term_title', {
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        if (result.nes_title.length === 0) {
+                            self.$setState({
+                                term_nes: true,
+                            });
+                        }
+                        if (result.opt_title.length === 0) {
+                            self.$setState({
+                                term_opt: true,
+                            });
+                        }
+                        self.$setState({
+                            term_nes_title: result.nes_title,
+                            term_opt_title: result.opt_title,
+                        });
+                    }
+                })
+            },
+
+            validateParam: function () {
+                let self = this;
+
+                if (self.usr_type === 1) {
+                    if (!self.pwd_valid || !self.pwd_match || !self.phone_valid) {
+                        return false;
+                    }
+                }
+
+                if (!self.phone_valid) {
+                    return false;
+                }
+
+                // if (!self.term_nes || !self.term_opt) {
+                if (!self.term_nes) {
+                    return false;
+                }
+
+                return true;
+            }
+
+        },
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                if (self.$route.query.email !== undefined) {
+                    self.$setState({
+                        email: self.$route.query.email,
+                    });
+                }
+
+                if (self.$route.query.usr_type !== undefined) {
+                    self.$setState({
+                        usr_type: parseInt(self.$route.query.usr_type),
+                    });
+
+                    if (parseInt(self.$route.query.usr_type) === 2) { // KK Login
+                        self.$setState({
+                            id_valid: true,
+                        });
+                    }
+                }
+
+                if (self.$route.query.email !== undefined) {
+                    self.$setState({
+                        email: self.$route.query.email,
+                    });
+                }
+
+                if (self.$route.query.name !== undefined) {
+                    self.$setState({
+                        name: self.$route.query.name,
+                    });
+                }
+
+                if (self.$route.query.email !== undefined && self.$route.query.usr_type !== undefined &&
+                    (self.$route.query.usr_type === 1 || self.$route.query.usr_type === 3)) {
+                    $('[data-name=signup] input[name=email]').addClass("input-with-value");
+                    $('[data-name=signup] input[name=email]').val(self.email);
+                }
+
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

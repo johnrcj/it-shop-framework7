@@ -1,0 +1,420 @@
+<template>
+    <div class="page" data-name="voucher_edit">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    {{#js_if 'this.uid == 0'}}
+                    <div class="text-5vw">{{$root.lang['voucher_register']}}</div>
+                    {{/js_if}}
+                    {{#js_if 'this.uid != 0'}}
+                    <div class="text-5vw">{{$root.lang['voucher_update']}}</div>
+                    {{/js_if}}
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            <div @click="onAddImg" class="add center flex justify-center" >
+                {{#js_if 'this.image_url == ""'}}
+                <div  class="voucher-back-image" style="background: url('assets/images/btn_barcode.png');">
+                </div>
+                {{/js_if}}
+                {{#js_if 'this.image_url != ""'}}
+                <img class="voucher-full-image" src="{{this.image_url}}">
+                {{/js_if}}
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['barcode']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input value="{{this.barcode}}" name="barcode" maxlength="30" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['barcode_note']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['name']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input value="{{this.name}}" name="name" maxlength="30" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['barcode_note']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['validity_period']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input @keyup="onKeyup" @change="onChange" value="{{this.expire_date}}" type="text" id="validity_period" name="validity_period" readonly="readonly">
+                <span @click="onFocus" class="placeholder">{{$root.lang['barcode_note']}}</span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['category']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input @change="onChange" @keyup="onKeyup" type="text" id="category" name="category" readonly="readonly">
+                <span @click="onFocus" class="placeholder">{{$root.lang['category_note']}}</span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['where_use']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input value="{{this.where_use}}" name="where_use" maxlength="30" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['barcode_note']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['memo']}}</label>
+            </div>
+
+            <div class="textarea-panel">
+                <textarea @input="onInput" rows="5" maxlength="50" value="{{this.memo}}" name="memo" placeholder="{{$root.lang['enter_note']}}"></textarea>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['voucher_amount']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input value="{{this.price}}" type="number" name="price" maxlength="10" @keyup="onKeyup" @input="onInput">
+                <span @click="onFocus" class="placeholder">{{$root.lang['barcode_note']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel">
+            </div>
+            {{#js_if 'this.uid == 0'}}
+            <a @click="onRegister" name="save" class="button-panel mt-4vw disabled">
+                {{#js_if 'this.uid == 0'}}
+                {{$root.lang['voucher_register']}}
+                {{/js_if}}
+                {{#js_if 'this.uid != 0'}}
+                {{$root.lang['voucher_update']}}
+                {{/js_if}}</a>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                barcode: "",
+                name: "",
+                expire_date: "",
+                where_use: "",
+                memo: "",
+                price: "",
+                err_msg: "",
+                uid: 0,
+                image: "",
+                image_url: "",
+                use_end: 0,
+                category_id: 0,
+            }
+        },
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+
+                if (e.target.parentNode.children[0].name === "category")
+                    $('[data-name=voucher_edit] input[name=category]').trigger('click');
+
+                if (e.target.parentNode.children[0].name === "validity_period")
+                    $('[data-name=voucher_edit] input[name=validity_period]').trigger('click');
+            },
+
+            validateParam: function() {
+                let self = this;
+
+                if (self.barcode === "") {
+                    return false;
+                }
+
+                // if (self.name === "") {
+                //     return false;
+                // }
+
+                if (self.expire_date === "") {
+                    return false;
+                }
+
+                // if (self.category_id === 0) {
+                //     return false;
+                // }
+                //
+                // if (self.where_use === "") {
+                //     return false;
+                // }
+                //
+                // if (self.price === "") {
+                //     return false;
+                // }
+                //
+                // if (self.image_url === "") {
+                //     return false;
+                // }
+
+                return true;
+            },
+
+            onInput: function (e) {
+                let self = this;
+
+                let name = e.target.name;
+                var maxlength = e.target.maxLength;
+                if (maxlength > 0 && e.target.value.length > maxlength) {
+                    $('[data-name=voucher_edit] input[name=' + name + ']').val(e.target.value.substring(0, maxlength));
+                    return;
+                }
+
+                self[name] = e.target.value;
+
+                if (self.validateParam()) {
+                    $('[data-name=voucher_edit] a[name=save]').removeClass("disabled");
+                } else {
+                    $('[data-name=voucher_edit] a[name=save]').addClass("disabled");
+                }
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+
+                if (e.keyCode === 13) {
+                    let name = e.target.name;
+                    if (name === "barcode") {
+                        $('[data-name=voucher_edit] input[name=name]').focus();
+                    } else if (name === "name") {
+                        $('[data-name=voucher_edit] input[name=validity_period]').focus();
+                    } else if (name === "validity_period") {
+                        $('[data-name=voucher_edit] input[name=where_use]').focus();
+                    } else if (name === "where_use") {
+                        $('[data-name=voucher_edit] input[name=price').focus();
+                    }
+                }
+            },
+
+            onChange: function(e) {
+                let self = this;
+
+                let name = e.target.name;
+                self[name] = e.target.value;
+
+                if (self.validateParam()) {
+                    $('[data-name=voucher_edit] a[name=save]').removeClass("disabled");
+                } else {
+                    $('[data-name=voucher_edit] a[name=save]').addClass("disabled");
+                }
+            },
+
+            getVoucherInfo: function() {
+                let self = this;
+                request('/main/get_category_list', {
+                }, function (result) {
+                    if(result.code === self.$root.CONST.RES_SUCCESS) {
+                        var uids = Array();
+                        var titles = Array();
+                        for (i=0; i<result.list.length; i++) {
+                            uids.push(result.list[i].uid);
+                            titles.push(result.list[i].title);
+                        }
+
+                        if (self.uid !== 0) {
+                            request('/Main/get_voucher_info', {
+                                user_id: self.$root.login_user.uid,
+                                id: self.uid
+                                }, function (result) {
+                                    if(result.code === self.$root.CONST.RES_SUCCESS) {
+                                        self.$setState ({
+                                            name: result.info.name,
+                                            barcode: result.info.barcode,
+                                            expire_date: result.info.expire_date,
+                                            where_use: result.info.where_use,
+                                            price: result.info.price,
+                                            image: result.info.image,
+                                            memo: result.info.memo,
+                                            image_url: result.info.image_url,
+                                            use_end: result.info.use_end,
+                                            category_id: result.info.category_id,
+                                        });
+
+                                        var category = titles[0];
+                                        for (i = 0; i < uids.length; i++) {
+                                            if (uids[i] === result.info.category_id) {
+                                                category = titles[i];
+                                                break;
+                                            }
+                                        }
+
+                                        initSelectPicker('category', uids, titles, category, self.changeCategoryPicker);
+                                        initDatePicker('validity_period', result.info.expire_date, self.changeDatePicker);
+
+                                        // customize input field
+                                        if (result.info.name !== "")
+                                            $('[data-name=voucher_edit] input[name=name]').addClass("input-with-value");
+                                        if (result.info.barcode !== "")
+                                            $('[data-name=voucher_edit] input[name=barcode]').addClass("input-with-value");
+                                        if (result.info.expire_date !== "")
+                                            $('[data-name=voucher_edit] input[name=expire_date]').addClass("input-with-value");
+                                        if (result.info.where_use !== "")
+                                            $('[data-name=voucher_edit] input[name=where_use]').addClass("input-with-value");
+                                        if (result.info.price !== "")
+                                            $('[data-name=voucher_edit] input[name=price]').addClass("input-with-value");
+                                    } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                        showToast(self.$root.lang['block_user_error']);
+                                        clearAndNavigateLoginPage();
+                                    } else {
+                                        showToast(result.msg);
+                                    }
+                                })
+                        } else {
+                            initSelectPicker('category', uids, titles, null, self.changeCategoryPicker);
+                        }
+                    } else {
+                        showToast(result.msg);
+                    }
+                })
+            },
+
+            onAddImg: function() {
+                let self = this;
+
+                bridgeUploadImage(1, function(file_name, file_url) {
+                    self.$setState({
+                        image: file_name,
+                        image_url: file_url
+                    });
+
+                    request('/Main/recognize_voucher', {
+                        image: file_name,
+                    }, function (result) {
+                        if(result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                barcode: result.info.barcode,
+                                name: result.info.name,
+                                where_use: result.info.where_use,
+                                expire_date: result.info.expire_date,
+                                price: result.info.price
+                            });
+
+                            if (result.info.expire_date !== "" && validateDate(result.info.expire_date))
+                                initDatePicker('validity_period', result.info.expire_date, self.changeDatePicker);
+                            else {
+                                var today = new Date();
+                                var dd = today.getDate();
+                                var mm = today.getMonth() + 1; //January is 0!
+                                var yyyy = today.getFullYear();
+                                today = yyyy+'-'+mm+'-'+dd;
+                                initDatePicker('validity_period', today, self.changeDatePicker);
+                            }
+
+                            // customize input field
+                            if (result.info.name !== "")
+                                $('[data-name=voucher_edit] input[name=name]').addClass("input-with-value");
+                            if (result.info.barcode !== "")
+                                $('[data-name=voucher_edit] input[name=barcode]').addClass("input-with-value");
+                            if (result.info.expire_date !== "")
+                                $('[data-name=voucher_edit] input[name=expire_date]').addClass("input-with-value");
+                            if (result.info.where_use !== "")
+                                $('[data-name=voucher_edit] input[name=where_use]').addClass("input-with-value");
+                            if (result.info.price !== "")
+                                $('[data-name=voucher_edit] input[name=price]').addClass("input-with-value");
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+                })
+            },
+
+            onRegister: function () {
+                let self = this;
+
+                let expire_date = self.expire_date;
+                if (!validateDate(self.expire_date)) {
+                    var today = new Date();
+                    var dd = today.getDate();
+                    var mm = today.getMonth() + 1; //January is 0!
+                    var yyyy = today.getFullYear();
+                    expire_date = yyyy+'-'+mm+'-'+dd;
+                }
+
+                request('/Main/add_voucher', {
+                    user_id: self.$root.login_user.uid,
+                    barcode :self.barcode,
+                    name: self.name,
+                    category_id: self.category_id,
+                    expire_date: expire_date,
+                    where_use: self.where_use,
+                    memo: self.memo,
+                    price: self.price,
+                    uid: self.uid,
+                    image: self.image,
+                    use_end: self.use_end
+                    }, function (result) {
+                        if(result.code === self.$root.CONST.RES_SUCCESS) {
+                            if (self.uid === 0) {
+                                showToast(self.$root.lang['register_success']);
+                            } else {
+                                showToast(self.$root.lang['update_success']);
+                            }
+
+                            back();
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            changeDatePicker: function (date) {
+                let self = this;
+
+                self.$setState({
+                    expire_date: $('[data-name=voucher_edit] input[name=validity_period').val()
+                });
+            },
+
+            changeCategoryPicker: function (key, value) {
+                let self = this;
+
+                self.$setState({
+                    category_id: key
+                });
+            }
+        },
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+
+                if (self.$route.query.uid !== undefined) {
+                    self.$setState({
+                        uid: self.$route.query.uid
+                    });
+                }
+
+                self.getVoucherInfo();
+            }
+        }
+    }
+</script>

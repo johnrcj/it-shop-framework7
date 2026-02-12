@@ -1,0 +1,226 @@
+<template>
+    <div class="page" data-name="find_pwd_reset">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['find_password']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-50vw">
+            <div class="label-panel center mt-6vw">
+                <img src="assets/images/ic_check_findpwd.png">
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['please_enter_a_password']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input type="password" name="pwd" maxlength="20" @keyup="onKeyup" @input="onInput" @focus="onFocus" @blur="onBlur">
+                <span @click="onFocus" class="placeholder">{{$root.lang['password_note']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['check_password']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input type="password" name="pwd_confirm" maxlength="20" @keyup="onKeyup" @input="onInput" @focus="onFocus" @blur="onBlur">
+                <span @click="onFocus" class="placeholder">{{$root.lang['password_note']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+        </div>
+
+        <div class="select-action-panel bottom-7vw pr-6vw pl-6vw" name="bottom_panel">
+            <label class="label-desc theme-color">{{this.err_msg}}</label>
+
+            <a @click="onSend" class="button-panel mt-2.5vw">{{$root.lang['reset_password']}}</a>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                pwd: "",
+                pwd_confirm: "",
+                pwd_valid: false,
+                pwd_match: false,
+                usr_uid: "",
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+
+                $('[data-name=find_pwd_reset] div[name=bottom_panel]').addClass('hidden');
+            },
+
+            onBlur: function(e) {
+                $('[data-name=find_pwd_reset] div[name=bottom_panel]').removeClass('hidden');
+            },
+
+            onInput: function (e) {
+                let self = this;
+                let name = e.target.name;
+                self[name] = e.target.value;
+
+                var maxlength = e.target.maxLength;
+                if (maxlength > 0 && e.target.value.length > maxlength) {
+                    $('[data-name=find_pwd_reset] input[name=' + name + ']').val(e.target.value.substring(0, maxlength));
+                    return;
+                }
+
+                if (name === "pwd") {
+                    if (self.pwd) {
+                        let value = e.target.value;
+                        if (validPwd(value)) {
+                            self.$setState({
+                                pwd_valid: true,
+                                err_msg: self.$root.lang['this_is_available_pwd']
+                            });
+                        } else {
+                            self.$setState({
+                                pwd_valid: false,
+                                err_msg: self.$root.lang['this_is_unavailable_password']
+                            });
+                        }
+
+                        let pwd_confirm = $('[data-name=find_pwd_reset] input[name=pwd_confirm]').val();
+                        if (pwd_confirm) {
+                            if (value !== pwd_confirm) {
+                                self.$setState({
+                                    pwd_match: false,
+                                    err_msg: self.$root.lang['passwords_do_not_match']
+                                });
+                            } else {
+                                self.$setState({
+                                    pwd_match: true,
+                                    err_msg: self.$root.lang['passwords_match']
+                                });
+                            }
+                        }
+                    } else {
+                        self.$setState({
+                            err_msg : "",
+                        });
+                    }
+                } else if (name === "pwd_confirm") {
+                    if (self.pwd_confirm) {
+                        let value = e.target.value;
+                        let pwd = $('[data-name=find_pwd_reset] input[name=pwd]').val();
+
+                        if (pwd) {
+                            if (value !== pwd) {
+                                self.$setState({
+                                    pwd_match: false,
+                                    err_msg: self.$root.lang['passwords_do_not_match']
+                                });
+                            } else {
+                                self.$setState({
+                                    pwd_match: true,
+                                    err_msg: self.$root.lang['passwords_match']
+                                });
+                            }
+                        }
+                    }
+                }
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+                if (e.keyCode === 13) {
+                    let name = e.target.name;
+
+                    if (name === "pwd") {
+                        $('[data-name=find_pwd_reset] input[name=pwd]').focus();
+                    } else if (name === "pwd_confirm") {
+                        $('[data-name=find_pwd_reset] input[name=pwd_confirm]').focus();
+                    } else {
+                        self.onSend();
+                    }
+                }
+            },
+
+            onSend: function() {
+                let self = this;
+
+                if (!self.pwd_valid || !self.pwd_match) {
+                    if (self.pwd === "") {
+                        self.$setState({
+                            err_msg: self.$root.lang['please_enter_password'],
+                        });
+                        $('[data-name=find_pwd_reset] input[name=pwd]').focus();
+                        startShakeAnim($('[data-name=find_pwd_reset] input[name=pwd]'));
+                        return;
+                    }
+
+                    if (!self.pwd_valid) {
+                        self.$setState({
+                            err_msg: self.$root.lang['this_is_unavailable_password'],
+                        });
+                        $('[data-name=find_pwd_reset] input[name=pwd]').focus();
+                        startShakeAnim($('[data-name=find_pwd_reset] input[name=pwd]'));
+                        return;
+                    }
+
+                    if (self.pwd_confirm === "") {
+                        self.$setState({
+                            err_msg: self.$root.lang['please_re_enter_your_password'],
+                        });
+                        $('[data-name=find_pwd_reset] input[name=pwd_confirm]').focus();
+                        startShakeAnim($('[data-name=find_pwd_reset] input[name=pwd_confirm]'));
+                        return;
+                    }
+
+                    if (self.pwd !== self.pwd_confirm) {
+                        $('[data-name=find_pwd_reset] input[name=pwd_confirm]').focus();
+                        startShakeAnim($('[data-name=find_pwd_reset] input[name=pwd_confirm]'));
+                    }
+
+                    return;
+                }
+
+                request('/Intro/update_pwd', {
+                    usr_uid: self.usr_uid,
+                    pwd: self.pwd,
+                }, function(result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        showToast(self.$root.lang['password_change_complete']);
+                        self.$root.navigate('/login');
+                    } else if (result.code === self.$root.CONST.RES_ERROR_INFO_NO_EXIST) {
+                        self.$setState({
+                            err_msg: self.$root.lang['this_information_is_not_registered']
+                        });
+                    } else {
+                        self.$setState({
+                            err_msg: result.msg
+                        });
+                    }
+                })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                self.$setState({
+                    usr_uid: self.$route.query.usr_uid,
+                });
+            }
+        }
+    }
+</script>

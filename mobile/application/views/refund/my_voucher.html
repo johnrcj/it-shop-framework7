@@ -1,0 +1,319 @@
+<template>
+    <div class="page" data-name="my_voucher">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['get_my_voucher_refund']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-30vw">
+            <div class="image-fill w-full">
+                <img src="{{this.info_url}}">
+            </div>
+            
+            <div class="flex label-panel underline  mt-4vw">
+                <label class="label-desc flex-1">{{$root.lang['terms']}}</label>                    
+                <div>
+                    <label class="item-checkbox item-content check-panel">
+                        <input @change="onAgreeAllTerms" type="checkbox" name="agree_all"
+                        {{#js_if "this.agree_all === true"}}checked{{/js_if}}
+                        {{#js_if "this.agree_all === false"}}indeterminate{{/js_if}}/>
+                        <i class="icon icon-checkbox"></i>
+                        <div class="item-inner">
+                            <div class="item-title">{{$root.lang['agree_all']}}</div>
+                        </div>
+                        </label>
+                </div>
+            </div>
+
+            {{#js_if 'this.term_nes_title.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onAgreeOneTerms" type="checkbox" name="term_nes"
+                           {{#js_if "this.term_nes == true"}}checked{{/js_if}}/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onNecessaryTerms' class="item-title">{{this.term_nes_title}}({{$root.lang['terms_necessary']}})</div>
+            </div>
+            {{/js_if}}
+
+            {{#js_if 'this.term_opt_title1.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onAgreeOneTerms" type="checkbox" name="term_opt1"
+                           {{#js_if "this.term_opt1 == true"}}checked{{/js_if}}/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onOptionalTerms1' class="item-title">{{this.term_opt_title1}}({{$root.lang['terms_optional']}})</div>
+            </div>
+            {{/js_if}}
+
+            {{#js_if 'this.term_opt_title2.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onAgreeOneTerms" type="checkbox" name="term_opt2"
+                           {{#js_if "this.term_opt2 == true"}}checked{{/js_if}}/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onOptionalTerms2' class="item-title">{{this.term_opt_title2}}({{$root.lang['terms_optional']}})</div>
+            </div>
+            {{/js_if}}
+
+            {{#js_if 'this.term_opt_title3.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onAgreeOneTerms" type="checkbox" name="term_opt3"
+                           {{#js_if "this.term_opt3 == true"}}checked{{/js_if}}/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onOptionalTerms3' class="item-title">{{this.term_opt_title3}}({{$root.lang['terms_optional']}})</div>
+            </div>
+            {{/js_if}}
+
+            {{#js_if 'this.term_opt_title4.length > 0'}}
+            <div class="option-panel mt-4vw">
+                <label class="item-checkbox item-content check-panel">
+                    <input @change="onAgreeOneTerms" type="checkbox" name="term_opt4"
+                           {{#js_if "this.term_opt4 == true"}}checked{{/js_if}}/>
+                    <i class="icon icon-checkbox"></i>
+                </label>
+                <div @click='onOptionalTerms4' class="item-title">{{this.term_opt_title4}}({{$root.lang['terms_optional']}})</div>
+            </div>
+            {{/js_if}}
+        </div>
+
+        <div class="select-action-panel bottom-7vw pr-6vw pl-6vw">
+            <label class="label-desc theme-color">{{this.err_msg}}</label>
+
+            <a @click="onNext" name="next" class="button-panel mt-2.5vw {{#js_if 'this.agree_all == false'}}disabled{{/js_if}}">{{$root.lang['next']}}</a>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                info_url: "",
+                sel_ids: "",
+
+                term_nes: false,
+                term_opt1: false,
+                term_opt2: false,
+                term_opt3: false,
+                term_opt4: false,
+                term_nes_title: "",
+                term_opt_title1: "",
+                term_opt_title2: "",
+                term_opt_title3: "",
+                term_opt_title4: "",
+                agree_all: false,
+            }
+        },
+
+        methods: {            
+            onBack: function () {
+                back();
+            },
+
+            onInput: function (e) {
+                let self = this;
+                let name = e.target.name;
+
+                var maxlength = e.target.maxLength;
+                if (maxlength > 0 && e.target.value.length > maxlength) {
+                    $('[data-name=my_voucher] input[name=' + name + ']').val(e.target.value.substring(0, maxlength));
+                    return;
+                }
+
+                self[name] = e.target.value;
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+                if (e.keyCode === 13) {
+                    let name = e.target.name;
+                }
+            },
+
+            onNext: function() {
+                let self = this;
+                
+                self.$root.navigate({
+                    path: '/refund/account_select',
+                    query: {
+                        sel_ids: self.sel_ids
+                    }
+                });
+            },
+
+            onNecessaryTerms: function(tab) {
+                this.$root.navigate({
+                    path: '/refund_term',
+                    query: {
+                        tab: 1,
+                    }
+                })
+            },
+
+            onOptionalTerms1: function(tab) {
+                this.$root.navigate({
+                    path: '/refund_term',
+                    query: {
+                        tab: 2,
+                    }
+                })
+            },
+
+            onOptionalTerms2: function(tab) {
+                this.$root.navigate({
+                    path: '/refund_term',
+                    query: {
+                        tab: 3,
+                    }
+                })
+            },
+
+            onOptionalTerms3: function(tab) {
+                this.$root.navigate({
+                    path: '/refund_term',
+                    query: {
+                        tab: 4,
+                    }
+                })
+            },
+
+            onOptionalTerms4: function(tab) {
+                this.$root.navigate({
+                    path: '/refund_term',
+                    query: {
+                        tab: 5,
+                    }
+                })
+            },
+
+            onAgreeAllTerms: function(e) {
+                var self = this;
+
+                let name = e.target.name;
+                self[name] = e.target.checked;
+
+                if (e.target.checked) {
+                    self.$setState({
+                        term_nes: true,
+                        term_opt1: true,
+                        term_opt2: true,
+                        term_opt3: true,
+                        term_opt4: true,
+                    });
+                } else {
+                    if (self.term_nes_title !== "")
+                        self.$setState({
+                            term_nes: false,
+                        });
+                    if (self.term_opt_title1 !== "")
+                        self.$setState({
+                            term_opt1: false,
+                        });
+                    if (self.term_opt_title2 !== "")
+                        self.$setState({
+                            term_opt2: false,
+                        });
+                    if (self.term_opt_title3 !== "")
+                        self.$setState({
+                            term_opt3: false,
+                        });
+                    if (self.term_opt_title4 !== "")
+                        self.$setState({
+                            term_opt4: false,
+                        });
+                }
+
+            },
+
+            onAgreeOneTerms: function(e) {
+                var self = this;
+
+                let name = e.target.name;
+                self[name] = e.target.checked;
+
+                if (self.term_nes && self.term_opt1 && self.term_opt2 && self.term_opt3 && self.term_opt4) {
+                    self.$setState({ agree_all: true });
+                } else {
+                    self.$setState({ agree_all: false });
+                }
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/Refund/get_my_voucher_info', {
+                    usr_uid: self.$root.login_user.uid,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                info_url: result.info_url,
+                            });
+
+                            if (result.nes_title.length === 0)
+                                self.$setState({
+                                    term_nes: true,
+                                });
+                            if (result.opt_title1.length === 0)
+                                self.$setState({
+                                    term_opt1: true,
+                                });
+                            if (result.opt_title2.length === 0)
+                                self.$setState({
+                                    term_opt2: true,
+                                });
+                            if (result.opt_title3.length === 0)
+                                self.$setState({
+                                    term_opt3: true,
+                                });
+                            if (result.opt_title4.length === 0)
+                                self.$setState({
+                                    term_opt4: true,
+                                });
+                            self.$setState({
+                                term_nes_title: result.nes_title,
+                                term_opt_title1: result.opt_title1,
+                                term_opt_title2: result.opt_title2,
+                                term_opt_title3: result.opt_title3,
+                                term_opt_title4: result.opt_title4,
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+                hideMainBottomMenu();
+                
+                if (self.$route.query.sel_ids !== undefined) {
+                    self.$setState({
+                        sel_ids: self.$route.query.sel_ids
+                    });              
+                }
+
+                self.loadPageInfo();
+            },
+
+            pageReinit: function(e) {
+                hideMainBottomMenu();
+            }
+        }
+    }
+</script>

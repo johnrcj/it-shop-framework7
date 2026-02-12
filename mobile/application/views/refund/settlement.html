@@ -1,0 +1,252 @@
+<template>
+    <div class="page" data-name="refund_settlement">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['refund']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center bg-white pt-16vw px-5vw">
+            <span @click="onRequestTip" class="badge">!</span></i>
+            <div class="flex flex-1 flex-col text-3.2vw ml-1.5vw">
+                <p class="m-0 color-black">{{$root.lang['request_cannot_be_canceled']}}</p>
+                <p class="m-0 color-black">{{$root.lang['be_sure_to_check_the_application_details']}}</p>
+            </div>
+        </div>
+        <div class="flex items-center px-5vw mt-4vw bg-white">
+            <span class="flex-1 text-3.2vw">{{$root.lang['refund_account']}}</span>
+        </div>
+        <div class="flex items-center px-5vw bg-white">
+            <div class="input-panel">
+                <input name="account" class="disabled">
+            </div>
+        </div>
+        <div class="flex items-center px-5vw mt-4vw bg-white">
+            <span class="text-3.2vw">{{$root.lang['estimated_amount_cash']}}</span>
+            <span @click="onCashTip" class="badge ml-1.5vw">!</span></i>
+        </div>
+        <div class="px-5vw pb-2vw bg-white">
+            <span class="text-10vw color-light-green">{{this.totalPrice}}</span>
+            <span class="text-6vw ml-1.5vw">$</span>
+        </div>
+        <div class="page-content pb-100vw back-gray">
+            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">
+                <span class="flex-1 text-3.2vw text-center color-gray">{{$root.lang['refund_planned_voucher']}}</span>
+            </div>
+            <div class="mb-1.5vw voucher-list">
+                {{#each this.voucher_list}}
+                <div class="voucher">
+                    <div class="voucher-image">
+                        <img src="{{this.image_url}}">
+                    </div>
+                    <div class="voucher-info-left">
+                        <div class="where-use">{{this.where_use}}</div>
+                        <div class="name mt-2.5vw">{{this.name}}</div>
+                    </div>
+                    <div class="voucher-info-right">
+                        <img class="remove-button" src="assets/images/btn_delete.png" @click="onSelectItemDelete({{this.uid}})"></img>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+<!--            <div class="flex items-center px-2.5vw py-1.3vw bg-white mt-1.5vw underline">-->
+<!--                <span class="flex-1 text-3.2vw text-center">{{$root.lang['payment_method']}}</span>-->
+<!--            </div>-->
+
+<!--            <div class="list list-panel px-5vw bg-white">-->
+<!--                <ul>-->
+<!--                    <li>-->
+<!--                        <label class="item-radio item-content radio-panel">-->
+<!--                            <input @input="onInput" type="radio" name="payment" value="credit_card" checked/>-->
+<!--                            <i class="icon icon-radio"></i>-->
+<!--                            <div class="item-inner">-->
+<!--                                <div class="item-title">{{$root.lang['credit_card']}}</div>-->
+<!--                            </div>-->
+<!--                        </label>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <label class="item-radio item-content radio-panel">-->
+<!--                            <input @input="onInput" type="radio" name="payment" value="kk_pay"/>-->
+<!--                            <i class="icon icon-radio"></i>-->
+<!--                            <div class="item-inner">-->
+<!--                                <div class="item-title">{{$root.lang['kk_pay']}}</div>-->
+<!--                            </div>-->
+<!--                        </label>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </div>-->
+        </div>
+
+        <div class="select-action-panel bottom-7vw pr-6vw pl-6vw">
+            <a @click="goRefund" name="refund" class="button button-raised button-blue flex-1 text-4vw">{{$root.lang['apply_for_refund']}}</a>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                voucher_list: [],
+                sel_ids: "",
+                bank_id: "",
+                account_number: "",
+                // payment: "credit_card",
+                amount_cash_mark: "",
+                check_cash_mark: "",
+            }
+        },
+
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onInput: function(e) {
+                let self = this;
+
+                let name = e.target.name;
+                self[name] = e.target.value;
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+
+                if (e.keyCode === 13) {
+                }
+            },
+
+            onRequestTip: function() {
+                let self = this;
+
+                if (self.check_cash_mark !== "")
+                    showToast(self.check_cash_mark, 10000);
+            },
+
+            onCashTip: function() {
+                let self = this;
+
+                if (self.amount_cash_mark !== "")
+                    showToast(self.amount_cash_mark, 10000);
+            },
+
+            goRefund: function(e) {
+                let self = this;
+
+                var ids = self.voucher_list[0].uid;
+                for (var i = 1; i < self.voucher_list.length; i++) {
+                    ids += ' ' + self.voucher_list[i].uid;
+                }
+                request('/refund/register_refund', {
+                    usr_uid: self.$root.login_user.uid,
+                    sel_ids: ids,
+                    // payment: self.payment,
+                    bank_id: self.bank_id,
+                    account_number: self.account_number
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            showToast(self.$root.lang['refund_success']);
+
+                            stepBack(3); // go back to refund
+                            $('[data-name=refund]').remove();
+                            self.$root.navigate('/refund');
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(self.$root.lang['refund_fail']);
+                        }
+                    })
+            },
+
+            onSelectItemDelete: function(uid) {
+                let self = this;
+
+                event.stopPropagation();
+
+                App_Dlg.confirm(
+                    self.$root.lang['delete_desc'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function () {
+
+                        if (self.voucher_list.length === 1) {
+                            showToast(self.$root.lang['cannot_remove_refund']);
+                            return;
+                        }
+
+                        voucher_list = [];
+                        prices = 0;
+                        for (var i = 0; i < self.voucher_list.length; i++) {
+                            voucher = self.voucher_list[i];
+                            if (uid !== parseInt(voucher.uid)) {
+                                voucher_list.push(voucher);
+                                prices += parseInt(voucher.price);
+                            }
+                        }
+
+                        self.$setState({
+                            totalPrice : prices.toLocaleString('en-US'),
+                            voucher_list: voucher_list,
+                        })
+                    });
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/refund/get_settlement_info', {
+                    usr_uid: self.$root.login_user.uid,
+                    sel_ids: self.sel_ids,
+                    }, function(result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            prices = 0;
+                            for (i = 0; i < result.voucher_list.length; i++) {
+                                voucher = result.voucher_list[i];
+                                prices += parseInt(voucher.price);
+                            }
+
+                            self.$setState({
+                                voucher_list: result.voucher_list,
+                                totalPrice: prices.toLocaleString('en-US'),
+                                check_cash_mark: result.check_cash_mark,
+                                amount_cash_mark: result.amount_cash_mark,
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+                hideMainBottomMenu();
+
+                bank_id = self.$route.query.bank_id;
+                bank_name = self.$route.query.bank_name;
+                account_number = self.$route.query.account_number;
+                account_name = self.$route.query.account_name;
+                $('[data-name=refund_settlement] input[name=account]').val(bank_name + ' / ' + account_number + ' / ' + account_name);
+
+                self.$setState({
+                    sel_ids: self.$route.query.sel_ids,
+                    bank_id: bank_id,
+                    account_number: account_number,
+                });
+
+                self.loadPageInfo();
+            },
+            
+            pageReinit: function(e) {
+                hideMainBottomMenu();
+            }
+        }
+    }
+</script>

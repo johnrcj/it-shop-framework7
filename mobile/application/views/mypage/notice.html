@@ -1,0 +1,135 @@
+<template>
+    <div class="page" data-name="notice">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['notice']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-4vw">
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['search_term']}}</label>
+            </div>
+
+            <div class="input-with-button-panel multiline">
+                <input @keyup="onKeyup" @Input="onInput" class="text-3.5vw" maxlength="20" name="search_key">
+                <span @click="onFocus" class="placeholder">{{$root.lang['search_word']}}</span>
+                <span class="input-clear-button"></span>
+                <img @click="onSearch" src="assets/images/ic_search_black.png">
+            </div>
+
+            <div class="scroll-panel">
+                <div class="list accordion-list">
+                    <ul>
+                        {{#each this.list}}
+                        <li class="accordion-item">
+                            <a class="item-link item-content" href="#" @click="onResizeTextarea">
+                                <div class="item-inner">
+                                    <div class="item-title">{{this.title}}</div>
+                                    <div class="item-time right">{{this.reg_time}}</div>
+                                </div>
+                            </a>
+                            <div class="accordion-item-content">
+                                <div class="block">
+                                    {{#js_if 'this.image_url.length > 0'}}
+                                    <img src="{{this.image_url}}"/>
+                                    {{/js_if}}
+                                    <div class="textarea-panel readonly">
+                                        <textarea readonly>{{this.content}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                list: [],
+                textarea_resize: true,
+            }
+        },
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+            },
+
+            onInput: function(e) {
+                let self = this;
+                let name = e.target.name;
+
+                self[name] = e.target.value;
+            },
+
+            onKeyup: function (e) {
+                let self = this;
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/Mypage/get_notice_list', {
+                    search_key: self.search_key,
+                }, function (result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        self.$setState({
+                            list: result.list
+                        });
+                    } else {
+                        showToast(result.msg);
+                    }
+                })
+            },
+
+            onSearch: function() {
+                let self = this;
+
+                self.loadPageInfo();
+
+                self.$setState({
+                    textarea_resize: true
+                });
+            },
+
+            onResizeTextarea: function (e) {
+                var self = this;
+
+                if (self.textarea_resize) {
+                    $('[data-name=notice] textarea').each(function () {
+                        if ($(this).val() !== "")
+                            $(this).height($(this).prop('scrollHeight'));
+                    });
+
+                    self.$setState({
+                        textarea_resize: false
+                    });
+                }
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

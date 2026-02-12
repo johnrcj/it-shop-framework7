@@ -1,0 +1,206 @@
+<template>
+    <div class="page" data-name="qna_write">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['ask_question']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-30vw">
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['please_enter_title']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input @keyup="onKeyup" @input="onInput" name="title" maxlength="20" @keyup="onKeyup" @focus="onFocus" @blur="onBlur">
+                <span @click="onFocus" class="placeholder">{{$root.lang['please_enter_title']}}</span>
+                <span class="input-clear-button"></span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['please_enter_content']}}</label>
+            </div>
+
+            <div class="textarea-panel">
+                <textarea @keyup="onKeyup" @input="onInput" name="content" maxlength="500" rows="6" placeholder="{{$root.lang['please_enter_content']}}" @focus="onFocus" @blur="onBlur"></textarea>
+<!--                <span class="input-clear-button"></span>-->
+            </div>
+
+            <div class="image-panel">
+                <div @click="onAddImg" class="add" name="img_add"></div>
+
+                {{#each this.images}}
+                <div class="image">
+                    <img src="{{this.url}}"/>
+                    <a @click="onRemoveImg" class="remove">
+                        <img name={{this.path}}  src="assets/images/btn_delete.png">
+                    </a>
+                </div>
+                {{/each}}
+            </div>
+
+            <div class="bottom-panel" name="bottom_panel">
+                <a @click="onRegister"  name="register" class="link button-panel mt-6vw disabled">{{$root.lang['question_register']}}</a>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                title: "",
+                content: "",
+                images: [],
+            }
+        },
+
+        methods: {
+            onBack: function() {
+                let self = this;
+
+                if (self.title || self.content || self.img_add_flag) {
+                    App_Dlg.confirm(self.$root.lang['qna_back_confirm_str'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function() {
+                        back();
+                        })
+                } else {
+                    back();
+                }
+            },
+
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+
+                $('[data-name=qna_write] div[name=bottom_panel]').addClass('hidden');
+            },
+
+            onBlur: function(e) {
+                $('[data-name=qna_write] div[name=bottom_panel]').removeClass('hidden');
+            },
+
+            onInput: function(e) {
+                let self = this;
+
+                let name = e.target.name;
+                let value = e.target.value;
+
+                self[name]= value;
+
+                if (self.title !== "" && self.content !== "") {
+                    $('[data-name=qna_write] a[name=register]').removeClass("disabled");
+                } else {
+                    $('[data-name=qna_write] a[name=register]').addClass("disabled");
+                }
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+                if(e.keyCode === 13) {
+                    let name = e.target.name;
+                    if (name === "label-title") {
+                        $('[data-name=qna_write] textarea[name=content]').focus();
+                    }
+                }
+            },
+
+            onRemoveImg: function(e) {
+                let self = this;
+
+                var new_images = [];
+                self.images.forEach((obj, idx) => {
+                    if (obj.path !== e.target.name)
+                        new_images.push(obj);
+                })
+
+                self.$setState({
+                    images: new_images,
+                })
+
+                if (self.images.length < 5) {
+                    $('[data-name=qna_write] div[name=img_add]').removeClass("hidden");
+                }
+            },
+
+            onAddImg: function() {
+                let self = this;
+
+                if (self.images.length >= 5) return;
+
+                App_Dlg.uploadImage(function(type) {
+                    bridgeUploadImage(type, function(file_name, file_url) {
+                        let item = {};
+                        item.path = file_name;
+                        item.url = file_url;
+
+                        var imgs = self.images;
+                        imgs.push(item);
+
+                        self.$setState({
+                            images: imgs,
+                        });
+
+                        if (imgs.length === 5) {
+                            $('[data-name=qna_write] div[name=img_add]').addClass("hidden");
+                        }
+                    })
+                })
+            },
+
+            onRegister: function() {
+                let self = this;
+
+                if(!self.title || !self.content) {
+                    App_Dlg.alert(self.$root.lang['please_enter_the_title_and_content'], self.$root.lang['confirm'], function() {
+                    });
+
+                    return;
+                }
+
+                App_Dlg.confirm(self.$root.lang['write_qna_confirm_str'],
+                    self.$root.lang['yes'],
+                    self.$root.lang['no'], function() {
+                        var temp = [];
+                        self.images.forEach((obj, idx) => {
+                            temp.push(obj.path);
+                        })
+                        var image_paths = temp.join(';');
+
+                        request('/Mypage/add_qna', {
+                            usr_uid: self.$root.login_user.uid,
+                            title: self.title,
+                            content: self.content,
+                            images: image_paths,
+                            }, function(result) {
+                                if(result.code === self.$root.CONST.RES_SUCCESS) {
+                                    App_Dlg.alert(self.$root.lang['question_registered'], self.$root.lang['confirm'], function() {
+                                        back();
+                                    }, false);
+                                } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                    showToast(self.$root.lang['block_user_error']);
+                                    clearAndNavigateLoginPage();
+                                } else {
+                                    showToast(result.msg);
+                                }
+                            })
+                    })
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+                self.$root.current_obj = self;
+            }
+        }
+    }
+</script>

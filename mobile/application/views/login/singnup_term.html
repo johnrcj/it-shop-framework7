@@ -1,0 +1,86 @@
+<template>
+    <div class="page" data-name="signup_term">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['terms']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel">
+            <div class="toolbar tabbar toolbar-panel">
+                <div class="toolbar-inner">
+                    {{#js_if 'this.nes_title.length > 0'}}
+                    <a href="#tab-1" class="tab-link {{#js_if 'this.firstTab == true'}}tab-link-active{{/js_if}}">{{this.nes_title}}</a>
+                    {{/js_if}}
+                    {{#js_if 'this.opt_title.length > 0'}}
+                    <a href="#tab-2" class="tab-link {{#js_if 'this.firstTab == false'}}tab-link-active{{/js_if}}">{{this.opt_title}}</a>
+                    {{/js_if}}
+                </div>
+            </div>
+            <div class="tabs-animated-wrap not-animated">
+                <div class="tabs">
+                    <div id="tab-1" class="page-content tab {{#js_if 'this.firstTab == true'}}tab-active{{/js_if}}">
+                        <div class="textarea-panel h-full readonly">
+                            <textarea readonly>{{this.nes_content}}</textarea>
+                        </div>
+                    </div>
+                    <div id="tab-2" class="page-content tab {{#js_if 'this.firstTab == false'}}tab-active{{/js_if}}">
+                        <div class="textarea-panel h-full readonly">
+                            <textarea readonly>{{this.opt_content}}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                firstTab: this.$route.query.tab === "necessary",
+                nes_title: "",
+                nes_content: "",
+                opt_title: "",
+                opt_content: "",
+            }
+        },
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            getTerms: function () {
+                let self = this;
+
+                request('/Term/get_signup_term_content', {
+                }, function (result) {
+                    if (result.code === self.$root.CONST.RES_SUCCESS) {
+                        self.$setState({
+                            nes_title: result.nes_title,
+                            nes_content: result.nes_content,
+                            opt_title: result.opt_title,
+                            opt_content: result.opt_content,
+                        });
+                    } else {
+                        showToast(result.msg);
+                    }
+                })
+            },
+        },
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+                self.getTerms();
+            }
+        }
+    }
+</script>

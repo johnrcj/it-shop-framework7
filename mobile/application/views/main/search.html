@@ -1,0 +1,274 @@
+<template>
+    <div class="page" data-name="search">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['search']}}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page-content top-navbar-content-panel">
+            <div class="search-label-panel">
+                <label class="label-desc">{{$root.lang['search_term']}}</label>
+                <div class="view-all-label" @click="onViewAll">{{$root.lang['view_all']}}</div>
+            </div>
+
+            <div class="input-with-button-panel">
+                <input @keyup="onKeyup" @Input="onInput" name="search_key" class="text-3.5vw" maxlength="20" placeholder="{{$root.lang['search_word']}}">
+                <span class="input-clear-button"></span>
+                <img @click="onSearch" src="assets/images/ic_search_black.png">
+            </div>
+
+            <div class="row search-content-panel">
+                <div class="row recent_content">
+                    <div class="width-100 flex_center flex">
+                        <label class="label-title flex-1 text-3.5vw">{{$root.lang['recent_searches']}}</label>
+                        <a @click="onRemoveRecentKeyAll" class="delete-total">{{$root.lang['total_delete']}}</a>
+                    </div>
+
+                    {{#js_if 'this.searchkey_list.length > 0'}}
+                    <div class="row mt-1.5vw">
+                        {{#each this.searchkey_list}}
+                        <div class="item_recent_searchkey">
+                            <label @click="getSearchResult('{{this.keyword}}')">{{this.keyword}}</label>
+                            <div @click="onRemoveRecentKeyword" class="delete_bg">
+                                <img src="assets/images/btn_close.png">
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                    {{/js_if}}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                searchkey_list: [],
+                search_key: ""
+            }
+        },
+        methods: {
+            onBack: function () {
+                let self = this;
+                back();
+            },
+
+            initSearchKeyInfo: function () {
+                $('[data-name=search] input[name=search_key]').focus();
+                $('[data-name=search] .search-content-panel').removeClass("hidden");
+
+                let self = this;
+
+                request('/Main/get_searchkey_info', {
+                    usr_uid: self.$root.login_user.uid,
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                searchkey_list: result.searchkey_list,
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            getSearchResult: function (search_key) {
+                let self = this;
+
+                $('[data-name=search] input[name=search_key]').val(search_key);
+                $('[data-name=search] .search-content-panel').addClass("hidden");
+                
+                request('/Main/get_search_result', {
+                    usr_uid: self.$root.login_user.uid,
+                    search_key: search_key,
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            $('[data-name=main]').remove();
+                            self.$root.navigate({
+                                path: '/main',
+                                query: {
+                                    search_key: search_key,
+                                }
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onRemoveRecentKeyword: function (e) {
+                let self = this;
+                let idx = $(e.target).closest(".item_recent_searchkey").index();
+                var arr_keyword = self.searchkey_list;
+
+                request('/Main/remove_searchkey', {
+                    usr_uid: self.$root.login_user.uid,
+                    keyword: arr_keyword[idx].keyword
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            arr_keyword.splice(idx, 1);
+                            self.$setState({
+                                searchkey_list: arr_keyword
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onRemoveRecentKeyAll: function () {
+                let self = this;
+
+                request('/Main/remove_recent_searchkey', {
+                    usr_uid: self.$root.login_user.uid,
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                searchkey_list: []
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            showToast(result.msg);
+                        }
+                    })
+            },
+
+            onInput: function (e) {
+                let self = this;
+                let name = e.target.name;
+                self[name] = e.target.value;
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+                if (e.keyCode === 13) {
+                    let self = this;                   
+
+                    self.getSearchResult(self.search_key);
+                }
+            },
+
+            onSearch: function () {
+                let self = this;              
+
+                self.getSearchResult(self.search_key);
+            },
+
+            onViewAll: function () {
+                let self = this;
+
+                self.$setState({
+                    search_key: ''
+                });
+
+                self.getSearchResult('');
+            },
+
+            initSwiper: function () {
+                let self = this;
+                if (this.arr_swiper.length > 0) {
+                    this.arr_swiper.map((item) => {
+                        item.destroy();
+                    })
+                }
+
+                var arr_swiper = Array();
+
+                app.swiper.create('[data-name=search] .review_img_swiper', {
+                    spaceBetween: 0,
+                    pagination: {
+                        el: '.common_swiper_pagination',
+                    },
+
+                    on: {
+                        init: function () {
+                            var swiper = this;
+                            arr_swiper.push(swiper);
+
+                            let totalCnt = swiper.imagesToLoad.length;
+                            $(swiper.$el).find(".fraction_pagination").html(1 + "/" + totalCnt);
+                        },
+
+                        slideChange: function () {
+                            var swiper = this;
+                            let activeIndex = swiper.activeIndex;
+                            let totalCnt = swiper.imagesLoaded;
+                            $(swiper.$el).find(".fraction_pagination").html((activeIndex + 1) + "/" + totalCnt);
+                        }
+                    }
+                });
+
+                app.swiper.create('[data-name=search] .freetalk_img_swiper', {
+                    spaceBetween: 0,
+                    pagination: {
+                        el: '.common_swiper_pagination',
+                    },
+
+                    on: {
+                        init: function () {
+                            var swiper = this;
+                            arr_swiper.push(swiper);
+
+                            let totalCnt = swiper.imagesToLoad.length;
+                            $(swiper.$el).find(".fraction_pagination").html(1 + "/" + totalCnt);
+                        },
+
+                        slideChange: function () {
+                            var swiper = this;
+                            let activeIndex = swiper.activeIndex;
+                            let totalCnt = swiper.imagesLoaded;
+                            $(swiper.$el).find(".fraction_pagination").html((activeIndex + 1) + "/" + totalCnt);
+                        }
+                    }
+                });
+
+                self.$setState({
+                    arr_swiper: arr_swiper
+                });
+            },
+        },
+        on: {
+            pageInit: function (page) {
+                hideMainBottomMenu();
+
+                let self = this;
+                self.initSearchKeyInfo();
+                if (self.$route.query.search_key !== undefined) {
+                    self.search_key = self.$route.query.search_key;                    
+                }
+
+                $('[data-name=search] input[name=search_key]').val(self.search_key);
+            },
+
+            pageReinit: function(e) {
+                let self = this;
+
+                if (self.$root.prev_page_name === "search") {
+                    hideMainBottomMenu();
+                    self.getSearchResult(self.search_key);
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,231 @@
+<template>
+    <div class="page" data-name="account_select">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_back" src="assets/images/btn_back.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['select_refund_account']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-30vw">
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['refund_account']}}</label>
+            </div>
+
+            <div class="input-panel multiline">
+                <input @change="onChange" @keyup="onKeyup" type="text" id="bank_name" name="bank_name" readonly="readonly" @focus="onFocus" @blur="onBlur">
+                <span @click="onFocus" class="placeholder">{{$root.lang['select_refund_account']}}</span>
+            </div>
+
+            <div class="label-panel">
+                <label class="label-desc">{{$root.lang['enter_refund']}}</label>
+            </div>
+
+            <div class="input-with-button-panel multiline">
+                <input @keyup="onKeyup" @input="onInput" type="number" id="account_number" name="account_number" maxlength="20" @focus="onFocus" @blur="onBlur">
+                <span @click="onFocus" class="placeholder">{{$root.lang['enter_account']}}</span>
+                <span class="input-clear-button"></span>
+                <a @click="onVerify">{{$root.lang['account_verify']}}</a>
+            </div>
+            <div class="textarea-panel refund readonly">
+                <textarea readonly>{{this.bank_info}}</textarea>
+            </div>
+        </div>
+
+        <div class="select-action-panel bottom-7vw pr-6vw pl-6vw" name="bottom_panel">
+            <label class="label-desc theme-color">{{this.err_msg}}</label>
+
+            <a @click="onNext" name="next" class="button-panel mt-2.5vw disabled">{{$root.lang['next']}}</a>
+        </div>
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                bank_id: 0,
+                bank_name: "",
+                account_number: "",
+                account_name: "",
+                bank_info: "",
+                sel_ids: "",
+            }
+        },
+
+        methods: {            
+            onBack: function () {
+                back();
+            },
+
+            onFocus: function(e) {
+                e.target.parentNode.children[0].focus();
+
+                $('[data-name=account_select] div[name=bottom_panel]').addClass('hidden');
+
+                if (e.target.parentNode.children[0].name === "bank_name")
+                    $('[data-name=account_select] input[name=bank_name]').trigger('click');
+            },
+
+            onBlur: function(e) {
+                $('[data-name=account_select] div[name=bottom_panel]').removeClass('hidden');
+            },
+
+            onInput: function (e) {
+                let self = this;
+
+                let name = e.target.name;
+                var maxlength = e.target.maxLength;
+                if (maxlength > 0 && e.target.value.length > maxlength) {
+                    $('[data-name=account_select] input[name=' + name + ']').val(e.target.value.substring(0, maxlength));
+                    return;
+                }
+
+                self[name] = e.target.value;
+
+                self.$setState({
+                    err_msg : "",
+                });
+            },
+
+            onChange: function(e) {
+                let self = this;
+
+                let name = e.target.name;
+                self[name] = e.target.value;
+            },
+
+            onKeyup: function(e) {
+                let self = this;
+
+                if (e.keyCode === 13) {
+                    let name = e.target.name;
+                    if (name === "account_number") {
+                        $('[data-name=account_select] input[name=account_number]').focus();
+                    }
+                }
+            },
+
+            onVerify: function() {
+                let self = this;
+
+                if (self.bank_id === 0) {
+                    self.$setState({
+                        err_msg: self.$root.lang['select_refund'],
+                    });
+
+                    return;
+                }
+
+                if (self.account_number === "") {
+                    self.$setState({
+                        err_msg: self.$root.lang['enter_account'],
+                    });
+
+                    return;
+                }
+
+                request('/Refund/verify_account', {
+                    usr_uid: self.$root.login_user.uid,
+                    bank: self.bank_id,
+                    account_number: self.account_number,
+                    }, function (result) {
+                        if(result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                account_name: result.account_name,
+                                err_msg: self.$root.lang['account_verify_success'],
+                            });
+
+                            $('[data-name=account_select] a[name=next]').removeClass("disabled");
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            self.$setState({
+                                err_msg: self.$root.lang['account_verify_failed'],
+                            });
+                        }
+                    })
+            },
+
+            onNext: function() {
+                let self = this;
+
+                self.$root.navigate({
+                    path: '/refund/settlement',
+                    query: {
+                        sel_ids: self.sel_ids,
+                        bank_id: self.bank_id,
+                        bank_name: self.bank_name,
+                        account_number: self.account_number,
+                        account_name: self.account_name,
+                    }
+                });
+            },
+
+            loadPageInfo: function () {
+                let self = this;
+
+                request('/Refund/get_account_page_info', {
+                    usr_uid: self.$root.login_user.uid,
+                    }, function (result) {
+                        if(result.code === self.$root.CONST.RES_SUCCESS) {
+                            self.$setState({
+                                bank_list: result.bank_list,
+                                bank_info: result.bank_info,
+                            });
+
+                            var uids = Array();
+                            var banks = Array();
+                            for (i=0; i<result.bank_list.length; i++) {
+                                uids.push(result.bank_list[i].uid);
+                                banks.push(result.bank_list[i].name);
+                            }
+
+                            self.$setState({
+                                bank_id: uids[0],
+                                bank_name: banks[0],
+                            });
+                            initSelectPicker('bank_name', uids, banks, null, self.changeBankPicker);
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            self.$setState({
+                                err_msg: result.mrr_msg,
+                            });
+                        }
+                    })
+            },
+
+            changeBankPicker: function (key, value) {
+                let self = this;
+
+                self.$setState({
+                    bank_id: key,
+                    bank_name: value
+                });
+            }
+        },
+
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+
+                if(self.$route.query.sel_ids !== undefined) {
+                    self.$setState({
+                        sel_ids: self.$route.query.sel_ids
+                    });              
+                }
+
+                self.loadPageInfo();
+            }
+        }
+    }
+</script>

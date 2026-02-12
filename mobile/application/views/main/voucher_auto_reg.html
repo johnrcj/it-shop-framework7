@@ -1,0 +1,195 @@
+<template>
+    <div class="page" data-name="voucher_auto_reg">
+        <div class="top-navbar-panel main fixed">
+            <div class="main-topbar relative underline">
+                <div @click="onBack" class="left link">
+                    <img class="ic_close" src="assets/images/btn_close.png">
+                </div>
+                <div class="search-panel flex flex-1 flex-col items-center justify-center">
+                    <div class="text-5vw">{{$root.lang['home']}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content top-navbar-content-panel pb-30vw">
+            <div name="voucher_desc" class="label-panel center mt-12vw">
+                <label class="label-desc">{{this.err_msg}}</label>
+            </div>
+
+            <div name="voucher_preloader" class="label-panel center mt-12vw">
+                <div class="preloader">
+                    <span class="preloader-inner">
+                        <span class="preloader-inner-gap"></span>
+                        <span class="preloader-inner-left">
+                            <span class="preloader-inner-half-circle"></span>
+                        </span>
+                        <span class="preloader-inner-right">
+                            <span class="preloader-inner-half-circle"></span>
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="image-fill w-full h-full">
+                <img name="voucher" class="hidden" src="{{this.current_img}}">
+            </div>
+        </div>
+
+        <div class="select-action-panel inline bottom-5vw px-5vw">
+            <a @click="onCancel" name="cancel" class="button button-raised button-white button-left disabled">{{$root.lang['save_cancel']}}</a>
+            <a @click="onSave" name="save" class="button button-raised button-blue button-right ml-5vw disabled">{{$root.lang['save_voucher']}}({{this.count_desc}})</a>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                image_list: [],
+                img_index: 0,
+                img_count: 0,
+                reg_count: 0,
+                count_desc: "0/0",
+                image_desc: "",
+                current_img : "",
+            }
+        },
+        methods: {
+            onBack: function () {
+                back();
+            },
+
+            onCancel: function () {
+                var self = this;
+
+                if (self.img_index === self.image_list.length - 1) {
+                    showToast(self.$root.lang['recognized_count'] + self.reg_count);
+                    back();
+                }
+
+                if (self.img_index < self.image_list.length - 1) {
+                    index = self.img_index + 1;
+                    self.$setState({
+                        img_index: index,
+                        count_desc: (index + 1) + "/" + self.img_count,
+                        current_img: self.image_list[index].image_url,
+                    });
+                }
+            },
+
+            onSave: function () {
+                var self = this;
+
+                request('/Main/add_voucher', {
+                    uid: 0,
+                    user_id: self.$root.login_user.uid,
+                    barcode: self.image_list[self.img_index].barcode,
+                    name: self.image_list[self.img_index].name,
+                    image: self.image_list[self.img_index].image,
+                    expire_date: self.image_list[self.img_index].expire_date,
+                    where_use: self.image_list[self.img_index].where_use,
+                    price: self.image_list[self.img_index].price,
+                    memo: self.image_list[self.img_index].memo,
+                    category_id: 0,
+                    use_end: 0,
+                    }, function (result) {
+                        if (result.code === self.$root.CONST.RES_SUCCESS) {
+                            count = self.reg_count + 1;
+                            self.$setState({
+                                reg_count: count,
+                            });
+                        } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                            showToast(self.$root.lang['block_user_error']);
+                            clearAndNavigateLoginPage();
+                        } else {
+                            self.$setState({
+                                err_msg: result.msg,
+                            });
+                        }
+
+                        if (self.img_index === self.image_list.length - 1) {
+                            showToast(self.$root.lang['recognized_count'] + count);
+                            back();
+                        }
+
+                        if (self.img_index < self.image_list.length - 1) {
+                            index = self.img_index + 1;
+                            self.$setState({
+                                img_index: index,
+                                count_desc: (index + 1) + "/" + self.img_count,
+                                current_img: self.image_list[index].image_url,
+                            });
+                        }
+                    })
+            },
+
+            recognizeVouchers: function () {
+                let self = this;
+
+                self.$setState({
+                    err_msg: self.$root.lang['wait_while_recognize']
+                });
+                $('[data-name=voucher_auto_reg] div[name=voucher_preloader]').removeClass("hidden");
+
+                bridgeUploadImages(function(file_names) {
+                    if (file_names === "") {
+                        self.$setState({
+                            err_msg: self.$root.lang['upload_image_has_0']
+                        });
+                        $('[data-name=voucher_auto_reg] div[name=voucher_preloader]').addClass("hidden");
+                        return;
+                    }
+                    request('/Main/recognize_multi_vouchers', {
+                        paths: file_names,
+                        }, function (result) {
+                            if (result.code === self.$root.CONST.RES_SUCCESS) {
+                                if (result.image_list.length === 0) {
+                                    self.$setState({
+                                        err_msg: self.$root.lang['recognition_result_has_0']
+                                    });
+                                } else {
+                                    self.$setState({
+                                        img_count: result.image_list.length,
+                                        image_list: result.image_list,
+                                        count_desc: "1/" + result.image_list.length,
+                                        current_img: result.image_list[0].image_url,
+                                    });
+
+                                    $('[data-name=voucher_auto_reg] div[name=voucher_desc]').addClass("hidden");
+                                    $('[data-name=voucher_auto_reg] img[name=voucher]').removeClass("hidden");
+                                    $('[data-name=voucher_auto_reg] a[name=cancel]').removeClass("disabled");
+                                    $('[data-name=voucher_auto_reg] a[name=save]').removeClass("disabled");
+                                }
+                            } else if (result.code === self.$root.CONST.RES_ERROR_USR_BLOCK || result.code === self.$root.CONST.RES_ERROR_USR_EXIT) {
+                                showToast(self.$root.lang['block_user_error']);
+                                clearAndNavigateLoginPage();
+                            } else {
+                                self.$setState({
+                                    err_msg: result.msg,
+                                });
+                            }
+
+                            $('[data-name=voucher_auto_reg] div[name=voucher_preloader]').addClass("hidden");
+                        })
+                })
+            }
+        },
+        on: {
+            pageInit: function (page) {
+                let self = this;
+
+                hideMainBottomMenu();
+
+                self.recognizeVouchers();
+            },
+            
+            pageReinit: function(e) {
+                let self = this;
+
+                hideMainBottomMenu();
+            }
+        }
+    }
+</script>
