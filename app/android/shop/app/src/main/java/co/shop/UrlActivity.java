@@ -1,4 +1,4 @@
-package kr.co.conpang;
+package co.shop;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

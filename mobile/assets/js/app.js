@@ -3,7 +3,7 @@ let $$ = Dom7;
 
 // Init App
 var app = new Framework7({
-    id: 'kr.co.conpang',
+    id: 'co.shop',
     root: '#app',
     theme: 'md',
     pushState: false,
@@ -74,7 +74,7 @@ function isIOS() {
 function isAndroid() {
     var ua = navigator.userAgent.toLowerCase();
     var isAndroid = ua.indexOf("android") > -1;
-    if (isAndroid == true && typeof conpangBridge !== 'undefined') {
+    if (isAndroid == true && typeof shopBridge !== 'undefined') {
         isAndroid = true;
     } else {
         isAndroid = false;
@@ -565,7 +565,7 @@ function request(url, data, successCallback, errorCallback, method='post') {
 }
 
 function isRunningOnWeb() {
-    if (typeof window.conpangBridge != 'undefined') {
+    if (typeof window.shopBridge != 'undefined') {
         return false;
     }
     return typeof window.webkit == 'undefined';

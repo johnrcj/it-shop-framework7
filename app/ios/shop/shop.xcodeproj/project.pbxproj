@@ -24,7 +24,7 @@
 		0C16259E97FF2CC297D8CE04 /* Pods-owner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-owner.release.xcconfig"; path = "Pods/Target Support Files/Pods-owner/Pods-owner.release.xcconfig"; sourceTree = "<group>"; };
 		80014D5F2331260F0052CAF9 /* Pods-owner.release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "Pods-owner.release.xcconfig"; path = "Pods/Target Support Files/Pods-owner/Pods-owner.release.xcconfig"; sourceTree = "<group>"; };
 		80014D602331260F0052CAF9 /* Pods-owner.debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "Pods-owner.debug.xcconfig"; path = "Pods/Target Support Files/Pods-owner/Pods-owner.debug.xcconfig"; sourceTree = "<group>"; };
-		8037EAF323311A3000699405 /* Conpang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Conpang.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8037EAF323311A3000699405 /* Shop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8037EAF623311A3000699405 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8037EAF823311A3000699405 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		8037EAFB23311A3000699405 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -82,7 +82,7 @@
 		8037EAF423311A3000699405 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8037EAF323311A3000699405 /* Conpang.app */,
+				8037EAF323311A3000699405 /* Shop.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -118,9 +118,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8037EAF223311A3000699405 /* Conpang */ = {
+		8037EAF223311A3000699405 /* Shop */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8037EB0523311A3100699405 /* Build configuration list for PBXNativeTarget "Conpang" */;
+			buildConfigurationList = 8037EB0523311A3100699405 /* Build configuration list for PBXNativeTarget "Shop" */;
 			buildPhases = (
 				8037EB4623311E7600699405 /* [CP] Check Pods Manifest.lock */,
 				8037EAEF23311A3000699405 /* Sources */,
@@ -132,9 +132,9 @@
 			);
 			dependencies = (
 			);
-			name = Conpang;
+			name = Shop;
 			productName = owner;
-			productReference = 8037EAF323311A3000699405 /* Conpang.app */;
+			productReference = 8037EAF323311A3000699405 /* Shop.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -170,7 +170,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8037EAF223311A3000699405 /* Conpang */,
+				8037EAF223311A3000699405 /* Shop */,
 			);
 		};
 /* End PBXProject section */
@@ -397,8 +397,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = kr.co.conpang;
-				PRODUCT_NAME = Conpang;
+				PRODUCT_BUNDLE_IDENTIFIER = co.shop;
+				PRODUCT_NAME = Shop;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
@@ -421,8 +421,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = kr.co.conpang;
-				PRODUCT_NAME = Conpang;
+				PRODUCT_BUNDLE_IDENTIFIER = co.shop;
+				PRODUCT_NAME = Shop;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
@@ -442,7 +442,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8037EB0523311A3100699405 /* Build configuration list for PBXNativeTarget "Conpang" */ = {
+		8037EB0523311A3100699405 /* Build configuration list for PBXNativeTarget "Shop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8037EB0623311A3100699405 /* Debug */,

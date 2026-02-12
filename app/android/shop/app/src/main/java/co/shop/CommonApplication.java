@@ -1,4 +1,4 @@
-package kr.co.conpang;
+package co.shop;
 
 import android.app.Application;
 import android.content.Context;
@@ -16,13 +16,14 @@ public class CommonApplication extends Application {
     private static CommonApplication instance = null;
     public PrefMgr mPrefMgr = null;
 
-    // FCM 토큰값
+    // FCM Token
     public String strFCMToken = "";
 
     /**
-     * singleton 애플리케이션 객체를 얻는다.
+     * singleton Get instance of application
      *
-     * @return singleton 애플리케이션 객체
+     * @return singleton instance of application
+     *
      */
     public static CommonApplication getGlobalApplicationContext( ) {
         if (instance == null)
@@ -46,7 +47,7 @@ public class CommonApplication extends Application {
     }
 
     /**
-     * 애플리케이션 종료시 singleton 어플리케이션 객체 초기화한다.
+     * When application has finished, init the object of application
      */
     @Override
     public void onTerminate( ) {

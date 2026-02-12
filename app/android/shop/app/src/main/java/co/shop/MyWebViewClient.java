@@ -1,4 +1,4 @@
-package kr.co.conpang;
+package co.shop;
 
 import android.content.Context;
 import android.graphics.Bitmap;

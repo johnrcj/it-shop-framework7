@@ -1,6 +1,6 @@
-package kr.co.conpang.util;
+package co.shop.util;
 
-import static kr.co.conpang.Constants.SERVER_URL;
+import static co.shop.Constants.SERVER_URL;
 
 import android.Manifest;
 import android.app.Activity;

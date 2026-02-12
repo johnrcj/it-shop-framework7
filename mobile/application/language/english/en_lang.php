@@ -1,5 +1,5 @@
 <?php
-$lang['app_name'] = 'Conpang';
+$lang['app_name'] = 'Shop';
 
 //common
 $lang['yes'] = 'Yes';
@@ -25,14 +25,14 @@ $lang['splash_label'] = 'Add value to Sleeping Gifticons!';
 
 //login page
 $lang['login'] = 'Login';
-$lang['welcome_to_conpang'] = 'Welcome to <br>Conpang.';
+$lang['welcome_to_shop'] = 'Welcome to <br>Shop.';
 $lang['scattered_gift_certificates_at_a_glance'] = 'Scattered gift certificates at a glance! <br>Sleeping money at once!';
 $lang['please_enter_registered_your_id_email'] = 'Please enter your registered phone number  or email address.';
 $lang['please_enter_your_phone'] = 'Please enter your registered phone number.';
 $lang['please_enter_a_password'] = 'Please enter your password.';
 $lang['kk'] = 'KK';
 $lang['apple'] = 'Apple';
-$lang['are_you_new_to_conpang'] = 'Are you new to conpang?';
+$lang['are_you_new_to_shop'] = 'Are you new to shop?';
 $lang['signup'] = 'SignUp';
 $lang['have_you_forgotten_your_password'] = 'Have you forgotten your password?';
 $lang['find_password'] = 'Find Password';
@@ -106,7 +106,7 @@ $lang['go_to_login'] = "Go To Login";
 
 //main tab
 $lang['refund'] = "Get Refund";
-$lang['myconpang'] = "My Conpang";
+$lang['myshop'] = "My Shop";
 
 //main page
 $lang['available_cnt'] = 'Available (All ';

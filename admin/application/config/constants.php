@@ -78,8 +78,8 @@ defined('UPLOAD_PATH') OR define('UPLOAD_PATH', FCPATH . '../upload');
 defined('UPLOAD_URL') OR define('UPLOAD_URL', "../upload/");
 
 // SESSION INFO
-defined('SESSION_MANAGER_UID') OR define('SESSION_MANAGER_UID', 'conpang_manager_uid');
-defined('SESSION_MANAGER_USRID') OR define('SESSION_MANAGER_USRID', 'conpang_user_id');
+defined('SESSION_MANAGER_UID') OR define('SESSION_MANAGER_UID', 'shop_manager_uid');
+defined('SESSION_MANAGER_USRID') OR define('SESSION_MANAGER_USRID', 'shop_user_id');
 
 define('API_RES_SUCCESS', 0);
 define('API_RES_ERR_PARAMETER', 1);

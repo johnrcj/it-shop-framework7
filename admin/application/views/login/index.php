@@ -47,7 +47,7 @@
     <form action="" method="post" style="padding: 0px;width:400px;background-color:white;margin: auto" id="login_form">
         <div class="row" style="padding: 20px 30px 30px 30px;">
             <div class="form-group col-md-12" align="center">
-                <label style="font-weight: bold; font-size: 25px"><?= $this->lang->line("conpang_admin") ?></label>
+                <label style="font-weight: bold; font-size: 25px"><?= $this->lang->line("shop_admin") ?></label>
             </div>
             <div class="col-md-12 form-group">
                 <div class="input-group width-100">

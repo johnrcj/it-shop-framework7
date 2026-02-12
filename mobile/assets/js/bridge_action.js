@@ -4,8 +4,8 @@ var bridgeCallback;
 function bridgeStart() {
     if (isIOS() === true) {
         window.webkit.messageHandlers.bridgeLoginInfo.postMessage({});
-    } else if (typeof window.conpangBridge != 'undefined') {//(isAndroid() == true) {
-        window.conpangBridge.bridgeLoginInfo();
+    } else if (typeof window.shopBridge != 'undefined') {//(isAndroid() == true) {
+        window.shopBridge.bridgeLoginInfo();
     }
 }
 
@@ -17,8 +17,8 @@ function bridgeSnsInfo(type, callback) {  //type=2: kakao,
         return;
     }
 
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeSnsInfo(type);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeSnsInfo(type);
     }
 
     if (typeof window.webkit != 'undefined') {
@@ -49,15 +49,15 @@ function bridgeLoginSuccess(usr_type, email, pwd) {
             pwd: pwd
         });
     } else if (isAndroid() === true) {
-        window.conpangBridge.bridgeLoginSuccess(parseInt(usr_type), email, pwd);
+        window.shopBridge.bridgeLoginSuccess(parseInt(usr_type), email, pwd);
     }
 }
 
 function bridgeUploadImage(type, callback) {
     bridgeCallback = callback;
 
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeUploadImage(type);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeUploadImage(type);
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeUploadImage.postMessage({
@@ -74,8 +74,8 @@ function bridgeUploadImage(type, callback) {
 function bridgeUploadImages(callback) {
     bridgeCallback = callback;
 
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeUploadImages();
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeUploadImages();
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeUploadImages.postMessage({
@@ -89,8 +89,8 @@ function bridgeUploadImages(callback) {
 }
 
 function bridgeLogout() {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeLogout();
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeLogout();
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeLogout.postMessage({});
@@ -98,8 +98,8 @@ function bridgeLogout() {
 }
 
 function bridgeGoUrl(url) {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeGoUrl(url);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeGoUrl(url);
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeGoUrl.postMessage({
@@ -109,8 +109,8 @@ function bridgeGoUrl(url) {
 }
 
 function bridgeInviteFriends(url) {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeInviteFriends(url);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeInviteFriends(url);
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeInviteFriends.postMessage({
@@ -122,8 +122,8 @@ function bridgeInviteFriends(url) {
 function bridgeFetchVersion(callback) {
     bridgeCallback = callback;
 
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeFetchVersion();
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeFetchVersion();
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeFetchVersion.postMessage({
@@ -139,8 +139,8 @@ function bridgeFetchVersion(callback) {
 function bridgeSendVoucher(image_urls, callback) {
     bridgeCallback = callback;
 
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeSendVoucher(image_urls);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeSendVoucher(image_urls);
     }
 
     if (typeof window.webkit != 'undefined') {
@@ -156,8 +156,8 @@ function bridgeSendVoucher(image_urls, callback) {
 }
 
 function bridgeFinishApp() {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeFinishApp();
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeFinishApp();
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeFinishApp.postMessage({});
@@ -165,8 +165,8 @@ function bridgeFinishApp() {
 }
 
 function bridgeResetMonthFlag() {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeResetMonthFlag();
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeResetMonthFlag();
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeResetMonthFlag.postMessage({});
@@ -174,8 +174,8 @@ function bridgeResetMonthFlag() {
 }
 
 function bridgeCall(phone) {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeCall(phone);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeCall(phone);
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeCall.postMessage({
@@ -191,8 +191,8 @@ function bridgeGetLocation(callback) {
     }
 
     bridgeCallback = callback;
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeGetLocation();
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeGetLocation();
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeGetLocation.postMessage({});
@@ -200,8 +200,8 @@ function bridgeGetLocation(callback) {
 }
 
 function bridgeRunSms(phone) {
-    if (typeof window.conpangBridge != 'undefined') {
-        window.conpangBridge.bridgeRunSms(phone);
+    if (typeof window.shopBridge != 'undefined') {
+        window.shopBridge.bridgeRunSms(phone);
     }
     if (typeof window.webkit != 'undefined') {
         window.webkit.messageHandlers.bridgeRunSms.postMessage({
