@@ -1,7 +1,7 @@
 Options FollowSymLinks
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /ConpangAdmin
+    RewriteBase /ShopAdmin
     RewriteCond $1 !^(index\.php|images|captcha|data|include|uploads|robots\.txt)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

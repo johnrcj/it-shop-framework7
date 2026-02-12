@@ -151,7 +151,7 @@ mysql -u root -p shop < database/shop.sql
 
 3. Configure backend (admin & mobile)
 - Edit admin/application/config/config.php
-  - Set $config['base_url'] to your admin URL, e.g. `http://localhost/ConpangAdmin/` or use a virtual host.
+  - Set $config['base_url'] to your admin URL, e.g. `http://localhost/ShopAdmin/` or use a virtual host.
   - Set $config['encryption_key'] (non-empty random string).
 - Edit admin/application/config/database.php and mobile/application/config/database.php
   - Update `hostname`, `username`, `password`, `database` according to your DB.

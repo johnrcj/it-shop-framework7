@@ -1,4 +1,4 @@
-package kr.co.conpang.util;
+package co.shop.util;
 
 import android.content.ContentUris;
 import android.content.Context;

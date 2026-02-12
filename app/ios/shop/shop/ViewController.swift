@@ -385,7 +385,7 @@ extension ViewController:WKScriptMessageHandler {
                 let url = params.value(forKey: "url") as! String
                 
                 let sharingItems = [
-                    "Conpang",
+                    "Shop",
                     url
                 ]
                 let activityViewController = UIActivityViewController(activityItems: sharingItems.flatMap({$0}), applicationActivities: nil)

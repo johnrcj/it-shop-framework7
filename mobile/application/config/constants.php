@@ -88,13 +88,6 @@ defined('EXIT__AUTO_MAX') OR define('EXIT__AUTO_MAX', 125); // highest automatic
 |--------------------------------------------------------------------------
 | File Upload Constants
 |--------------------------------------------------------------------------
-|
-| 파일이 업로드되는 서버경로, 파일의 서버 URL,
-| 파일들이 업로드되는 폴더명들을 저장한다.
-|
-| 파일업로드 경로룰
-| 회원 프로필 : UPLOAD_PATH/FOLDER_USER/년/월/일/
-|
 */
 defined('SERVER_PATH') OR define('SERVER_PATH', FCPATH . "../");
 defined('UPLOAD_PATH') OR define('UPLOAD_PATH', FCPATH . '../upload');
@@ -109,9 +102,6 @@ defined('DEFAULT_USER_IMAGE') OR define('DEFAULT_USER_IMAGE', 'assets/images/ic_
 |--------------------------------------------------------------------------
 | Email Constants
 |--------------------------------------------------------------------------
-|
-| Email 전송시 이용되는 관리자명, 관리자이메일
-|
 */
 defined('EMAIL_ADDR') OR define('EMAIL_ADDR', 'ych04436@gmail.com');//ych04436@gmail.com
 defined('EMAIL_NAME') OR define('EMAIL_NAME', '골프');
@@ -120,9 +110,6 @@ defined('EMAIL_NAME') OR define('EMAIL_NAME', '골프');
 |--------------------------------------------------------------------------
 | Pagination Constants
 |--------------------------------------------------------------------------
-|
-| 페이지네이션시 이용되는 Limit 갯수
-|
 */
 defined('LIMIT_10') OR define('LIMIT_10', 10);
 defined('LIMIT_20') OR define('LIMIT_20', 20);
@@ -131,9 +118,6 @@ defined('LIMIT_20') OR define('LIMIT_20', 20);
 |--------------------------------------------------------------------------
 | SMS Constants
 |--------------------------------------------------------------------------
-|
-| SMS 발송시 이용되는 Constants
-|
 */
 defined('SMS_USER_ID') OR define('SMS_USER_ID', 'dnlemal123');
 defined('SMS_USER_KEY') OR define('SMS_USER_KEY', 'BDkMPwg4Bz1QZVxzBjFQbAQ9UjILMAFvAG0DZQcxUjNXIQ==');
