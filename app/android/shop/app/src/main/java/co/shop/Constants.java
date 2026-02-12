@@ -1,13 +1,13 @@
-package kr.co.conpang;
+package co.shop;
 
 /**
  * Created by StarThomas.
  */
 
 public interface Constants {
-    String SERVER_URL = "http://192.168.0.70:81/ConpangMobile/";
+    String SERVER_URL = "http://192.168.0.70:81/CouponMobile/";
 
-    public static String SDCARD_FOLDER = "Conpang";
+    public static String SDCARD_FOLDER = "Coupon";
     boolean IS_TEST = true;
     int ANDROID = 1;
     String BROADCAST_EVENT_SET_PUSH_TOKEN = "BROADCAST_EVENT_SET_PUSH_TOKEN";

@@ -1,4 +1,4 @@
-package kr.co.conpang.fcm;
+package co.shop.fcm;
 
 //import com.google.firebase.messaging.FirebaseMessagingService;
 //import com.google.firebase.messaging.RemoteMessage;

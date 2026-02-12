@@ -1,7 +1,7 @@
 <?php
-$lang['app_name'] = 'Conpang';
+$lang['app_name'] = 'Shop';
 
-$lang['bottom_menu_content'] = 'Conpang  	<br>TEL : 0000-0000 	COPYRIGHT(c)2021 CONPANG ALL RIGHTS RESERVED';
+$lang['bottom_menu_content'] = 'Shop  	<br>TEL : 0000-0000 	COPYRIGHT(c)2021 ALL RIGHTS RESERVED';
 
 //common
 $lang['confirm'] = 'Confirm';
@@ -31,7 +31,7 @@ $lang['new_password'] = 'New Password';
 $lang['new_password_confirm'] = 'Password Confirm';
 
 //login page
-$lang['conpang_admin'] = 'Conpang Admin';
+$lang['shop_admin'] = 'Shop Admin';
 $lang['id'] = 'ID';
 $lang['password'] = 'Password';
 $lang['login'] = 'Login';

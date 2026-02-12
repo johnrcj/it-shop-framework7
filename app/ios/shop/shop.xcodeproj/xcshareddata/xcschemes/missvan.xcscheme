@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8037EAF223311A3000699405"
-               BuildableName = "Conpang.app"
-               BlueprintName = "Conpang"
+               BuildableName = "Shop.app"
+               BlueprintName = "Shop"
                ReferencedContainer = "container:missvan.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8037EAF223311A3000699405"
-            BuildableName = "Conpang.app"
-            BlueprintName = "Conpang"
+            BuildableName = "Shop.app"
+            BlueprintName = "Shop"
             ReferencedContainer = "container:missvan.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8037EAF223311A3000699405"
-            BuildableName = "Conpang.app"
-            BlueprintName = "Conpang"
+            BuildableName = "Shop.app"
+            BlueprintName = "Shop"
             ReferencedContainer = "container:missvan.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

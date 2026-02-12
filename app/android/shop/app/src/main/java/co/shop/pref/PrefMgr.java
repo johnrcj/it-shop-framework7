@@ -1,4 +1,4 @@
-package kr.co.conpang.pref;
+package co.shop.pref;
 
 import android.content.Context;
 import android.content.SharedPreferences;

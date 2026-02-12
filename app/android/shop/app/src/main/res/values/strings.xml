@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Conpang</string>
+    <string name="app_name">Shop</string>
 
     <string name="kakao_app_key">c9193853d2e7fc1aa1e36418e82605e7</string>
     <string name="kakao_scheme">kakaocc9193853d2e7fc1aa1e36418e82605e7</string>

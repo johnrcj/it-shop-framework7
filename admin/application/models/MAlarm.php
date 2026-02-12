@@ -43,7 +43,7 @@ class MAlarm extends MY_Model {
                 $this->load->library('fcm_library');
                 $push_data = [
                     'type' => $type,
-                    'title' => "Conpang",
+                    'title' => "Shop",
                     'message' => $content,
                 ];
 

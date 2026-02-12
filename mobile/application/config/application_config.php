@@ -6,7 +6,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Assets URL
 |--------------------------------------------------------------------------
 |
-|assets 디렉토리 URL 입니다.
 |
 */
 

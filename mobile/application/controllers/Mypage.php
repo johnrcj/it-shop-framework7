@@ -16,25 +16,25 @@ class Mypage extends MY_Controller {
 
         //TODO: YJ specify correct url of app store
         if ($dev_type == 1) { // Android
-            $update_url =  "https://play.google.com/store/apps/details?id=kr.co.conpang";
+            $update_url =  "https://play.google.com/store/apps/details?id=co.shop";
             $info = $this->db->get_where("t_app", ['field_name' => 'update_android_url'])->row();
             if ($info != null) {
                 $update_url = $info->field_value;
             }
 
-            $share_url =  "https://play.google.com/store/apps/details?id=kr.co.conpang";
+            $share_url =  "https://play.google.com/store/apps/details?id=co.shop";
             $info = $this->db->get_where("t_app", ['field_name' => 'share_android_url'])->row();
             if ($info != null) {
                 $share_url = $info->field_value;
             }
         } else { // iOS
-            $update_url = "http://itunes.apple.com/lookup?bundleId=kr.co.conpang";
+            $update_url = "http://itunes.apple.com/lookup?bundleId=co.shop";
             $info = $this->db->get_where("t_app", ['field_name' => 'update_ios_url'])->row();
             if ($info != null) {
                 $update_url = $info->field_value;
             }
 
-            $share_url = "http://itunes.apple.com/lookup?bundleId=kr.co.conpang";
+            $share_url = "http://itunes.apple.com/lookup?bundleId=co.shop";
             $info = $this->db->get_where("t_app", ['field_name' => 'share_ios_url'])->row();
             if ($info != null) {
                 $share_url = $info->field_value;

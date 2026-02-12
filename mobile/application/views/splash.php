@@ -37,7 +37,7 @@
             <div onclick="onButtonMenu(3)" class="bottom-menu-item mypage link">
                 <div class="child">
                     <i></i>
-                    <div class="title"><?= $this->lang->line("myconpang") ?></div>
+                    <div class="title"><?= $this->lang->line("myshop") ?></div>
                 </div>
             </div>
         </div>

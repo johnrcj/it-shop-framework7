@@ -11,7 +11,7 @@ import Foundation
 //////////////////////////////////////////////////////////////////////
 // MARK: - Public vars
 //////////////////////////////////////////////////////////////////////
-var m_webUrl : String! = "http://192.168.0.70:81/ConpangMobile/"
+var m_webUrl : String! = "http://192.168.0.70:81/ShopMobile/"
 
 var m_token : String! = "iOSToken"
 var m_userID : String! = ""

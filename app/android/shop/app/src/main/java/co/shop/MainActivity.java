@@ -1,8 +1,8 @@
-package kr.co.conpang;
+package co.shop;
 
-import static kr.co.conpang.Constants.FILE_PICK_REQUEST;
-import static kr.co.conpang.Constants.REQUEST_PERMISSION_CODE;
-import static kr.co.conpang.Constants.SERVER_URL;
+import static co.shop.Constants.FILE_PICK_REQUEST;
+import static co.shop.Constants.REQUEST_PERMISSION_CODE;
+import static co.shop.Constants.SERVER_URL;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mWebView.addJavascriptInterface(new ContentManager(getApplicationContext()), "conpangBridge");
+        mWebView.addJavascriptInterface(new ContentManager(getApplicationContext()), "shopBridge");
         mWebView.loadUrl(Constants.SERVER_URL);
     }
 
