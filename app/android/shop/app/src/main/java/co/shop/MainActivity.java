@@ -56,10 +56,10 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
-import kr.co.conpang.pref.PrefMgr;
-import kr.co.conpang.util.Downloader;
-import kr.co.conpang.util.ImageFilePathUtil;
-import kr.co.conpang.util.Util;
+import co.shop.pref.PrefMgr;
+import co.shop.util.Downloader;
+import co.shop.util.ImageFilePathUtil;
+import co.shop.util.Util;
 
 
 public class MainActivity extends AppCompatActivity {
