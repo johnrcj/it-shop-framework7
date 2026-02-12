@@ -1,6 +1,6 @@
-# Conpang / It-Shop Framework7
+# Framework7 / It-Coupon 
 
-<img src="mobile/assets/images/ic_splash_logo.png" alt="Conpang Splash Logo" width="240">
+<img src="mobile/assets/images/ic_splash_logo.png" alt="Splash Logo" width="240">
 
 A multi-platform voucher management system — admin backend + mobile web app + native Android/iOS clients.
 
@@ -8,20 +8,20 @@ A multi-platform voucher management system — admin backend + mobile web app + 
 - 📱 Mobile web & hybrid UI: Framework7 (Framework7 + jQuery + Framework7 assets)
 - 🤖 Android: Gradle project
 - 🍎 iOS: Xcode with CocoaPods (Firebase, Alamofire, etc.)
-- 🗄️ Database: MySQL (schema in database/conpang.sql)
+- 🗄️ Database: MySQL (schema in database/shop.sql)
 
 ---
 
 ## 🎯 About
 
-Conpang (it-shop-framework7) is a voucher / coupon manager platform. The repository contains:
+Coupon (it-shop-framework7) is a voucher / coupon manager platform. The repository contains:
 
 - Admin dashboard (admin/) — CodeIgniter based.
 - Mobile web API & UI (mobile/) — CodeIgniter endpoints and Framework7-powered UI.
 - Native mobile clients:
   - Android app (app/android/shop) — Gradle project using a small library included.
   - iOS app (app/ios/shop) — Swift project using CocoaPods for Firebase, Alamofire, CropViewController, etc.
-- Database schema: database/conpang.sql
+- Database schema: database/shop.sql
 
 Framework7 is used as the mobile UI framework (see mobile/assets and mobile/views). The Framework7 files and styles power the mobile experience, making it feel native on Android/iOS devices when wrapped in a WebView or used as a PWA shell.
 
@@ -88,7 +88,7 @@ High-level tree (selected important files & folders). Use this to quickly find w
       - 📁 shop
         - 📁 app (Android app module)
           - build.gradle (app module)
-          - src/main/java/kr/co/conpang/*.java (Native Android code)
+          - src/main/java/co/shop/*.java (Native Android code)
         - 📁 library (SlideToggle view library used by Android project)
     - 📁 ios
       - 📁 shop
@@ -96,7 +96,7 @@ High-level tree (selected important files & folders). Use this to quickly find w
         - shop.xcodeproj / shop.xcworkspace
         - AppDelegate.swift, ViewController.swift
   - 📁 database
-    - 📄 conpang.sql (MySQL database schema)
+    - 📄 shop.sql (MySQL database schema)
   - 📄 LICENSE (MIT)
   - ... (many vendor assets and 3rd-party libs)
 
@@ -106,7 +106,7 @@ High-level tree (selected important files & folders). Use this to quickly find w
 
 - Backend
   - PHP (CodeIgniter 3.x) — admin and mobile APIs
-  - MySQL — schema in database/conpang.sql
+  - MySQL — schema in database/shop.sql
   - PHPExcel — spreadsheet handling (admin/application/libraries/Classes/PHPExcel)
 - Mobile web UI
   - Framework7 — primary UI framework for mobile web (mobile/assets/**)
@@ -144,9 +144,9 @@ cd it-shop-framework7
 2. Database — import schema
 ```bash
 # create database
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS conpang CHARACTER SET utf8 COLLATE utf8_general_ci;"
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS shop CHARACTER SET utf8 COLLATE utf8_general_ci;"
 # import schema
-mysql -u root -p conpang < database/conpang.sql
+mysql -u root -p shop < database/shop.sql
 ```
 
 3. Configure backend (admin & mobile)
