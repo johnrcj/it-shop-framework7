@@ -2,16 +2,12 @@
 
 /**
  * Created by PhpStorm.
- * User: Gambler
- * Date: 2018-02-12
- * Time: 오후 3:24
  */
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 /**++++++++++++++++++++++++++++++++++++++++++
- * Array 관련 메서드들
  * +++++++++++++++++++++++++++++++++++++++++++*/
 
 
@@ -313,9 +309,9 @@ if (!function_exists('_get_file_url')) {
         if (strpos($file_upload_path, "http:") === 0 || strpos($file_upload_path, "https:") === 0)
             return $file_upload_path;
 
-		if ($default_file_path == '') {
-			$default_file_path = assets_url('assets/images/img_photo_default.png');
-		}
+        if ($default_file_path == '') {
+            $default_file_path = assets_url('assets/images/img_photo_default.png');
+        }
 
         $file_path = _make_dir('', false) . DIRECTORY_SEPARATOR . $file_upload_path;
 
@@ -323,10 +319,10 @@ if (!function_exists('_get_file_url')) {
             if ($is_thumbnail) {
                 return
                     _file_exists(_get_thumbnail($file_path))
-                        ?
-                        _get_thumbnail(base_url(UPLOAD_URL . $file_upload_path))
-                        :
-                        str_replace('\\', '/', base_url(UPLOAD_URL . $file_upload_path));
+                    ?
+                    _get_thumbnail(base_url(UPLOAD_URL . $file_upload_path))
+                    :
+                    str_replace('\\', '/', base_url(UPLOAD_URL . $file_upload_path));
             } else {
                 return str_replace('\\', '/', base_url(UPLOAD_URL . $file_upload_path));
             }
@@ -367,7 +363,7 @@ if (!function_exists('_make_thumbnail')) {
     {
         // 이미지파일경로를 파일명까지와 확장자로 분리한다.
         $image_info = getimagesize($src_file_path);
-//        // 파일 확장자 얻기
+        //        // 파일 확장자 얻기
 //        $org_file_ext = strtolower(substr(strrchr($src_file_path, "."), 1));
 //        // 파일명 얻기
 //        $org_filename = basename($src_file_path, "." . $org_file_ext);
@@ -396,7 +392,7 @@ if (!function_exists('_make_thumbnail')) {
             $w = 300;
             $h = $w * $image_info[1] / $image_info[0];
             $canvas = imagecreatetruecolor($w, $h);
-//            imagecopyresized($canvas, $new_image, 0, 0, 0, 0, $w, $h, $image_info[0], $image_info[1])
+            //            imagecopyresized($canvas, $new_image, 0, 0, 0, 0, $w, $h, $image_info[0], $image_info[1])
             imagecopyresampled($canvas, $new_image, 0, 0, 0, 0, $w, $h, $image_info[0], $image_info[1]);
             imagejpeg($canvas, $thumb_file_path);
         }
@@ -418,7 +414,7 @@ if (!function_exists('_get_file_path')) {
     function _get_file_path($file_upload_path, $default_image_path = '')
     {
         $file_path = _make_dir('', false) . DIRECTORY_SEPARATOR . $file_upload_path;
-//		return _file_exists($file_path) ? $file_path : $default_image_path;
+        //		return _file_exists($file_path) ? $file_path : $default_image_path;
         return $file_path;
     }
 }
@@ -452,7 +448,7 @@ if (!function_exists('_get_random_string')) {
      */
     function _get_random_string($length = 6)
     {
-//		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        //		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -696,10 +692,8 @@ if (!function_exists('_compress')) {
 
         if ($info['mime'] == 'image/jpeg')
             $image = imagecreatefromjpeg($src_file_path);
-
         elseif ($info['mime'] == 'image/gif')
             $image = imagecreatefromgif($src_file_path);
-
         elseif ($info['mime'] == 'image/png')
             $image = imagecreatefrompng($src_file_path);
 
@@ -763,7 +757,8 @@ if (!function_exists('_make_phone_format')) {
         return $f_val . (strlen($s_val) == 0 ? '' : '-') . $s_val . (strlen($e_val) == 0 ? '' : '-') . $e_val;
     }
 
-    function _make_terms($kind) {
+    function _make_terms($kind)
+    {
         $term_kind = '';
         switch ($kind) {
             case 1:
@@ -795,7 +790,8 @@ if (!function_exists('_make_phone_format')) {
         return $term_kind;
     }
 
-    function _make_warning($kind) {
+    function _make_warning($kind)
+    {
         $warning_kind = '';
         switch ($kind) {
             case 1:
