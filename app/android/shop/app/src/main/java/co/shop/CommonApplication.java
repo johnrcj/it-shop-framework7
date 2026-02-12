@@ -3,7 +3,7 @@ package kr.co.conpang;
 import android.app.Application;
 import android.content.Context;
 
-import kr.co.conpang.pref.PrefMgr;
+import co.shop.pref.PrefMgr;
 
 //import com.facebook.FacebookSdk;
 //import com.kakao.auth.KakaoSDK;

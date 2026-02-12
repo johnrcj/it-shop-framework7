@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import kr.co.conpang.CommonApplication;
+import co.shop.CommonApplication;
 
 public class PrefMgr {
     private static final String FCM_TOKEN = "as_fcm_token";

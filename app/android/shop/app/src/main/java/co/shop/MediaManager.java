@@ -38,8 +38,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import kr.co.conpang.util.ImageFilePathUtil;
-import kr.co.conpang.util.Util;
+import co.shop.util.ImageFilePathUtil;
+import co.shop.util.Util;
 
 public class MediaManager {
 

@@ -25,7 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import kr.co.conpang.Constants;
+import co.shop.Constants;
 
 public class Downloader {
 

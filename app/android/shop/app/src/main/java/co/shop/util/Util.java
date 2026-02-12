@@ -47,8 +47,8 @@ import java.util.Locale;
 import java.util.UUID;
 
 import cz.msebera.android.httpclient.Header;
-import kr.co.conpang.MainActivity;
-import kr.co.conpang.R;
+import co.shop.MainActivity;
+import co.shop.R;
 
 
 public class Util {
